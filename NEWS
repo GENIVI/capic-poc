@@ -1,0 +1,32 @@
+capic 0.1.0
+-----------
+
+* This is the first public release of Common API C.  The project is in
+  the early stages and does not yet provide much of consumable
+  functionality.  The current goal is to flesh out the big picture of
+  how the functionality should be split and what are the required
+  interfaces.
+
+* Reference examples including 'simple', 'game' and 'smartie' are
+  provided to drive the development and to illustrate the usage.
+
+* Supported Franca features include:
+
+  - synchronous and asynchronous method invocation (including
+    fireAndForget);
+
+  - primitive data types of fixed size (i.e., Boolean, IntNN, UIntNN,
+    Float, and Double).
+
+* Supported backends include only D-Bus (via libsystemd's sd-bus).
+
+* Both client and server applications are capable of managing multiple
+  interface instances.  Additionally, server applications can provide
+  different implementation for instances of a particular interface.
+  Working with multiple instances and their implementations is
+  illustrated by the 'simple' reference example.
+
+* Backends use an event loop to manage asynchronicity.  Backends
+  provide an interface to embed their event loop into the
+  application's event loop.  Event loop embedding is illustrated by
+  the 'game' reference example.

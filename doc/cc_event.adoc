@@ -1,0 +1,89 @@
+////
+SPDX license identifier: MPL-2.0
+Copyright (C) 2015, Visteon Corp.
+Author: Pavel Konopelko, pkonopel@visteon.com
+
+This file is part of Common API C
+
+This Source Code Form is subject to the terms of the
+Mozilla Public License (MPL), version 2.0.
+If a copy of the MPL was not distributed with this file,
+you can obtain one at http://mozilla.org/MPL/2.0/.
+For further information see http://www.genivi.org/.
+////
+
+= cc_backend_get_event_context(3)
+:doctype: manpage
+:ptr: *
+
+
+NAME
+----
+cc_backend_get_event_context, cc_event_get_native, cc_event_get_fd, cc_event_prepare, cc_event_check, cc_event_dispatch - embed backend event loop into the external one run by the application
+
+
+SYNOPSIS
+--------
+[subs="normal"]
+----
+#include <cc/server.h>
+
+int **cc_backend_get_event_context**(struct cc_event_context {ptr}*_context_);
+
+void {ptr}**cc_event_get_native**(struct cc_event_context *_context_);
+
+int **cc_event_get_fd**(struct cc_event_context *_context_);
+int **cc_event_prepare**(struct cc_event_context *_context_);
+int **cc_event_check**(struct cc_event_context *_context_);
+int **cc_event_dispatch**(struct cc_event_context *_context_);
+----
+
+
+DESCRIPTION
+-----------
+The `*cc_backend_get_event_context*()` function returns a pointer to opaque data structure `cc_event_context` that represents the event loop implementation used by the backend.
+
+The `*cc_event_get_native*()` function returns a pointer to the '`native`' event loop implementation used by the backend.  Applications can attach their event sources directly to this implementation and bypass the additional level of indirection.  This approach is not portable, though, and is only supported as a shortcut.
+
+The remaining functions enable embedding of the backend event loop into the application event loop.
+
+The `*cc_event_get_fd*()` function returns a file descriptor that can be polled to wait for backend event sources to fire.
+
+The `*cc_event_prepare*()` function prepares the backend event sources for polling.  It must be called before the file descriptor is polled.
+
+The `*cc_event_check*()` function verifies whether any of the backend event sources has fired.  It must be called after the file descriptor has been polled.
+
+The `*cc_event_dispatch*()` function invokes callbacks for those backend event sources that have fired.
+
+
+RETURN VALUE
+------------
+The `*cc_backend_get_event_context*()` function returns a negative error code on failure and a non-negative value on success.  In the latter case, an opaque pointer to the backend event loop implementation is returned in `*_context_`.
+
+The `*cc_event_prepare*()` function returns a negative error code on failure, a positive value when at least one event source can be dispatched and zero otherwise.
+
+The `*cc_event_check*()` function returns a negative error code on failure, a positive value when at least one event source can be dispatched and zero otherwise.
+
+The `*cc_event_dispatch*()` function returns a negative error code on failure, a positive value when the event loop continues and zero when the event loop has finished.
+
+
+ERRORS
+------
+`*-ECHILD*`::
+Process PID has changed since the call to `*cc_backend_startup*()`.
+`*-ESTALE*`::
+Event loop has been already terminated.
+`*-EBUSY*`::
+Illegal state of event loop to invoke this function.
+
+
+COPYING
+-------
+Copyright \(C) 2015 Visteon Corporation
+
+This Source Code Form is subject to the terms of the Mozilla Public License (MPL), version 2.0.
+
+
+AUTHORS
+-------
+Pavel Konopelko <\pkonopel@visteon.com>

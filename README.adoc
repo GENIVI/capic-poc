@@ -1,0 +1,93 @@
+Common API C
+============
+
+Purpose and Principles
+----------------------
+The purpose of this project is to enable programs written in C to work with interfaces defined in Franca IDL <<franca>>.  This would allow writing application code for both clients and servers that does not depend on the communication mechanism between them (e.g., D-Bus, SOME/IP, in-process, etc.)  For this to work, the application code needs to rely on a defined mapping of Franca IDL to C language constructs and on the corresponding run-time support.  Additionally to that, the communication via a particular mechanism is implemented by the binding code that is generated automatically.
+
+The following principles and constraints apply:
+
+* Align as much as possible with the Franca IDL mapping (e.g., for the data types) and implementation features (e.g., the approach to concurrency) implemented by Common API for C++ <<capicpp>>.
+* Rely on the existing Franca framework for model transformations and code generation under Eclipse.
+* Leave with applications the design choices related to concurrency (i.e., the main event loop vs. threading), to memory management (i.e., dynamic vs. static allocation) and to other major areas.
+* Prioritize D-Bus/kdbus and in-process communication over other mechanisms for Linux environments.
+* Support non-Linux environments and especially embedded, resource-constrained systems (e.g., do not require using dynamically allocated memory).
+* Long-term, minimize the redundancy with the Common API for C++ in the areas of Eclipse tooling and run-time support (e.g., backend libraries).
+
+
+Governance and Infrastructure
+-----------------------------
+This project is run under the governance of GENIVI System Infrastructure Expert Group.  Contributions are accepted from all interested parties independent of their GENIVI affiliation (see <<contribute>>, Option 1).
+
+git repository:
+
+* git://git.projects.genivi.org/common-api/c-poc.git
+* http://git.projects.genivi.org/common-api/c-poc.git
+
+Mailing list:
+
+* genivi-ipc@lists.genivi.org
+
+Wiki:
+
+* coming soon
+
+
+Dependencies and Installation
+-----------------------------
+This project includes several sub-projects, each with its own build scripts.  The shared backend library is under the directory `capic/`.  Several reference applications are in their own sub-directories under `ref/`.
+
+All sub-projects require `sd-bus` and `sd-event` (provided as a part of `libsystemd`).  The systemd versions starting with v220 and later should work in the default configuration.  Additionally, the application `ref/game` requires GLib.
+
+All sub-projects use autotools and can be built and installed from the git repo with:
+
+----
+$ autoreconf -i ; ./configure ; make ; sudo make install
+----
+
+The build was tested and is known to work with the fido release of Poky `core-image-minimal`.
+
+
+Coding Style
+------------
+The coding style for the C language is similar to that of the Linux kernel.  There are (of course), a couple of differences.  For example, the indentation uses fours spaces instead of tabs.  A more formal description is given by the following configuration for `clang-format`:
+
+----
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+BreakBeforeBraces: Linux
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: false
+MaxEmptyLinesToKeep: 2
+AlignEscapedNewlinesLeft: true
+AllowShortFunctionsOnASingleLine: Inline
+# Not available in 3.5
+# SpaceAfterCStyleCast: true
+----
+
+There are also some additional tweaks that `clang-format` cannot handle:
+
+* The parameter list in function declarations and definitions should be broken up in the same way as for function calls.  That is there is _always_ a break after the opening parenthesis and all following lines are indented:
++
+----
+void function_declaration_that_must_be_broken_up(
+    void *parameter1, void *parameter2, void *parameter3, void *parameter4);
+----
+
+* In compound statements `if`, `for`, `switch`, or `while` followed by a block and where the expression in parentheses was broken up into multiple lines, the line break should be inserted _before_ the brace (and not after it):
++
+----
+if (long_expression_that_will_have_to_be_broken_across_multiple_lines &&
+    another_long_expression_that_will_have_to_be_broken_across_multiple_lines)
+{
+    ...
+}
+----
+
+
+References
+----------
+* [[[franca]]] https://github.com/franca/franca
+* [[[capicpp]]] http://projects.genivi.org/commonapi/
+* [[[contribute]]] http://www.genivi.org/contribute

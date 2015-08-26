@@ -1,0 +1,48 @@
+Common API C: Reference Applications
+====================================
+
+Introduction
+------------
+The development of the code generator and of the runtime library is driven by a few reference examples.  Their code is written manually including the parts that are supposed to be generated automatically later on (see sub-directories `src-gen/`).  In the early phases of development, these applications help to drive the architecture and interface design of the Common API.  Later on their code can be used as the reference to verify the code generator output.
+
+The subsequent sections provide details on the individual examples.  Each one includes a pair of applications--a server and a client.  Servers implement instances of interfaces defined by the corresponding Franca IDL descriptions.  Clients connect to the instances created by the servers and invoke their functionality.
+
+
+Simple
+------
+This reference example is designed to test using multiple interface instances on both client and server sides.  The implementation is built around the `Calculator` interface:
+
+[source]
+----
+include::simple/Calculator.fidl[lines=14..-1]
+----
+
+`Calculator` instances implement simple arithmetic operations.  Both client (`simpleclient`) and server (`simpleserver`) applications create two instances of the interface.  On the server side, the instances also have different implementations.  One implementation correctly splits the argument into the whole and fractional parts.  Another implementation always returns fixed values.  The client invokes the method `Calculator.split()` on each of the instances and then exits.
+
+
+Game
+----
+This reference example is designed to test using asynchronous communication implemented by state machines on both client and server sides.  It utilizes regular Franca methods along with fire and forget methods.  The server uses `sd-event` to implement its event loop, while the client relies on `GLib` main loop.  The implementation is built around the `Ball` interface:
+
+[source]
+----
+include::game/Ball.fidl[lines=14..-1]
+----
+
+`Ball` instance implemented by the server (`ball`) can be grabbed and dropped by the client (`player`).  While grabbed, the ball will refuse attempts to grab it again.  Once dropped, the ball takes a fixed time to fall down after that it can be grabbed again.
+
+When the player is launched, it first waits for a random time and then tries to grab the ball.  If grabbing succeeds, it holds the ball for a random time, drops it and exits.  If grabbing fails, the player repeats waiting for a random time before trying to grab the ball again.
+
+
+Smartie
+-------
+WARNING: This reference example is still under construction.
+
+The purpose of this reference example is currently to test using by one application of both client- and server-side instances of the same Franca interface.  The implementation is built around the `Smartie` interface:
+
+[source]
+----
+include::smartie/Smartie.fidl[lines=14..-1]
+----
+
+`Smartie` instances represent smart phone users that can communicate with each other by means of phone calls, text messages, etc.  Currently, only rudimentary support for making calls is implemented.  Once the application `smartalice` is launched, it tries to call another application `smartbob`.
