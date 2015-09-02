@@ -35,17 +35,17 @@ Wiki:
 
 Dependencies and Installation
 -----------------------------
-This project includes several sub-projects, each with its own build scripts.  The shared backend library is under the directory `capic/`.  Several reference applications are in their own sub-directories under `ref/`.
+This project includes several sub-projects, each with its own build scripts.  The source of shared backend library `capic` is under the top-level directory.  Several reference examples are located in their own sub-directories under `ref/`.
 
-All sub-projects require `sd-bus` and `sd-event` (provided as a part of `libsystemd`).  The systemd versions starting with v220 and later should work in the default configuration.  Additionally, the application `ref/game` requires GLib.
+All sub-projects require `sd-bus` and `sd-event` (provided as a part of `libsystemd`) and are compatible with systemd versions starting with v219.  However, the reference examples must be explicitly told to support systemd v219 or v220 (e.g., by appending `-DCC_SD_API_VERSION=219` to `CFLAGS` before the build).  Additionally, the application `ref/game` requires GLib.
 
-All sub-projects use autotools and can be built and installed from the git repo with:
+All sub-projects use autotools and can be built and installed from the git repo with the following commands executed from their respective directory:
 
 ----
 $ autoreconf -i ; ./configure ; make ; sudo make install
 ----
 
-The build was tested and is known to work with the fido release of Poky `core-image-minimal`.
+The build and functionality of the reference examples were tested and are known to work with the fido release of Poky `core-image-minimal` (e.g., with `fido:08d32590411568e7bf11612ac695a6e9c6df6286`) and with Fedora 23 Alpha.  In either environment, the functionality was tested with both `kdbus` and `dbus-1` as the transport.  Since all reference examples use the system bus, the corresponding policy for `dbus-1` on the test system must be relaxed to allow arbitrary applications to connect and communicate (e.g., by modifying `/etc/dbus-1/system-local.conf`).  No policy adjustments are needed for `kdbus`.
 
 
 Coding Style

@@ -30,7 +30,7 @@ struct cc_server_Calculator {
 
 
 static int cc_Calculator_split_thunk(
-    sd_bus *bus, sd_bus_message *m, void *userdata, sd_bus_error *error)
+    CC_IGNORE_BUS_ARG sd_bus_message *m, void *userdata, sd_bus_error *error)
 {
     int result = 0;
     struct cc_server_Calculator *ii = (struct cc_server_Calculator *) userdata;
@@ -39,7 +39,6 @@ static int cc_Calculator_split_thunk(
     int32_t fraction = 0;
 
     CC_LOG_DEBUG("invoked cc_Calculator_split_thunk()\n");
-    assert(bus);
     assert(m);
     assert(ii && ii->impl);
     CC_LOG_DEBUG("with path='%s'\n", sd_bus_message_get_path(m));

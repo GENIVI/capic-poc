@@ -11,10 +11,6 @@
  * For further information see http://www.genivi.org/.
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include <capic/backend.h>
 
 #include <assert.h>
@@ -48,13 +44,11 @@ CC_PUBLIC int cc_backend_startup()
     }
 
     CC_LOG_DEBUG("connected to bus with:\n");
-#if HAVE_SD_BUS_GET_SCOPE
     result = sd_bus_get_scope(backend.bus, &scope);
     if (result < 0) {
         CC_LOG_ERROR("unable to get bus scope: %s\n", strerror(-result));
         goto fail;
     }
-#endif
     CC_LOG_DEBUG("scope=%s\n", scope);
     result = sd_bus_get_bus_id(backend.bus, &id);
     if (result < 0) {
@@ -224,14 +218,14 @@ CC_PUBLIC int cc_event_prepare(struct cc_event_context *context)
     }
 #if 1
     /* Already prepared--defer further processing */
-    if (state != SD_EVENT_PASSIVE) {
+    if (state != SD_EVENT_INITIAL) {
         result = (state == SD_EVENT_PENDING);
         CC_LOG_DEBUG("returning cc_event_prepare()=%d\n", result);
         return result;
     }
 #else
     /* Already prepared--call sd_event_wait() first */
-    if (state == SD_EVENT_PREPARED) {
+    if (state == SD_EVENT_ARMED) {
         result = sd_event_wait(context->event, 0);
         if (result < 0) {
             CC_LOG_ERROR("unable to wait on client event: %s\n", strerror(-result));

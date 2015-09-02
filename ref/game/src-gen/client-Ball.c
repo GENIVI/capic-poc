@@ -73,13 +73,17 @@ fail:
 }
 
 static int cc_Ball_grab_reply_thunk(
-    sd_bus *bus, sd_bus_message *message, void *userdata, sd_bus_error *ret_error)
+    CC_IGNORE_BUS_ARG sd_bus_message *message, void *userdata, sd_bus_error *ret_error)
 {
     int result = 0;
+    sd_bus *bus;
     struct cc_client_Ball *ii = (struct cc_client_Ball *) userdata;
     int success_int;
 
     CC_LOG_DEBUG("invoked cc_Ball_grab_reply_thunk()\n");
+    assert(message);
+    bus = sd_bus_message_get_bus(message);
+    assert(bus);
     assert(ii);
     assert(ii->grab_reply_callback);
     assert(ii->grab_reply_slot == sd_bus_get_current_slot(bus));

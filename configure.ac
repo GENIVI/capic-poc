@@ -20,15 +20,19 @@ AC_PROG_INSTALL
 LT_PREREQ([2.2])
 LT_INIT([disable-static])
 
-PKG_CHECK_MODULES([LIBSYSTEMD], [libsystemd])
-AC_CHECK_LIB( \
-    [systemd], [sd_bus_open], \
-    [dummy=yes], [AC_MSG_ERROR([libsystemd must include sd-bus library])])
-AC_CHECK_LIB( \
-    [systemd], [sd_bus_get_scope], \
-    [AC_DEFINE([HAVE_SD_BUS_GET_SCOPE], [1], \
-        [Define to 1 if libsystemd supports sd_bus_get_scope() introduced in v221])], \
+PKG_CHECK_MODULES([LIBSYSTEMD], [libsystemd >= 219])
+AC_CHECK_LIB(
+    [systemd], [sd_bus_open],
+    [dummy=yes], [AC_MSG_ERROR([libsystemd must have sd-bus library enabled])])
+AC_CHECK_LIB(
+    [systemd], [sd_bus_get_scope],
+    [AC_DEFINE([HAVE_SD_BUS_GET_SCOPE], [1],
+        [Define to 1 if libsystemd supports sd_bus_get_scope() introduced in v221])],
     [dummy=yes])
+AC_CHECK_DECLS(
+    [SD_EVENT_INITIAL], [], [],
+    [[#include <systemd/sd-bus.h>
+      #include <systemd/sd-event.h>]])
 
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([Makefile capic.pc])

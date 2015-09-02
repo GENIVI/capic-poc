@@ -75,13 +75,17 @@ fail:
 }
 
 static int cc_Smartie_call_reply_thunk(
-    sd_bus *bus, sd_bus_message *message, void *userdata, sd_bus_error *ret_error)
+    CC_IGNORE_BUS_ARG sd_bus_message *message, void *userdata, sd_bus_error *ret_error)
 {
     int result = 0;
+    sd_bus *bus;
     struct cc_client_Smartie *ii = (struct cc_client_Smartie *) userdata;
     int32_t status;
 
     CC_LOG_DEBUG("invoked cc_Smartie_call_reply_thunk()\n");
+    assert(message);
+    bus = sd_bus_message_get_bus(message);
+    assert(bus);
     assert(ii);
     assert(ii->call_reply_callback);
     assert(ii->call_reply_slot == sd_bus_get_current_slot(bus));
@@ -199,13 +203,17 @@ fail:
 }
 
 static int cc_Smartie_hangup_reply_thunk(
-    sd_bus *bus, sd_bus_message *message, void *userdata, sd_bus_error *ret_error)
+    CC_IGNORE_BUS_ARG sd_bus_message *message, void *userdata, sd_bus_error *ret_error)
 {
     int result = 0;
+    sd_bus *bus;
     struct cc_client_Smartie *ii = (struct cc_client_Smartie *) userdata;
     int32_t status = 0;
 
     CC_LOG_DEBUG("invoked cc_Smartie_hangup_reply_thunk()\n");
+    assert(message);
+    bus = sd_bus_message_get_bus(message);
+    assert(bus);
     assert(ii);
     assert(ii->hangup_reply_callback);
     assert(ii->hangup_reply_slot == sd_bus_get_current_slot(bus));

@@ -30,14 +30,13 @@ struct cc_server_Ball {
 
 
 static int cc_Ball_grab_thunk(
-    sd_bus *bus, sd_bus_message *m, void *userdata, sd_bus_error *error)
+    CC_IGNORE_BUS_ARG sd_bus_message *m, void *userdata, sd_bus_error *error)
 {
     int result = 0;
     struct cc_server_Ball *ii = (struct cc_server_Ball *) userdata;
     bool success = false;
 
     CC_LOG_DEBUG("invoked cc_Ball_grab_thunk()\n");
-    assert(bus);
     assert(m);
     assert(ii && ii->impl);
     CC_LOG_DEBUG("with path='%s'\n", sd_bus_message_get_path(m));
@@ -75,13 +74,12 @@ static int cc_Ball_grab_thunk(
 }
 
 static int cc_Ball_drop_thunk(
-    sd_bus *bus, sd_bus_message *m, void *userdata, sd_bus_error *error)
+    CC_IGNORE_BUS_ARG sd_bus_message *m, void *userdata, sd_bus_error *error)
 {
     int result = 0;
     struct cc_server_Ball *ii = (struct cc_server_Ball *) userdata;
 
     CC_LOG_DEBUG("invoked cc_Ball_drop_thunk()\n");
-    assert(bus);
     assert(m);
     assert(ii && ii->impl);
     CC_LOG_DEBUG("with path='%s'\n", sd_bus_message_get_path(m));
@@ -116,7 +114,7 @@ static int cc_Ball_drop_thunk(
 static const sd_bus_vtable vtable_Ball[] = {
     SD_BUS_VTABLE_START(0),
     SD_BUS_METHOD("grab", "", "b", &cc_Ball_grab_thunk, 0),
-    SD_BUS_METHOD("drop", "", "", &cc_Ball_drop_thunk, 0),
+    SD_BUS_METHOD("drop", "", "", &cc_Ball_drop_thunk, SD_BUS_VTABLE_METHOD_NO_REPLY),
     SD_BUS_VTABLE_END
 };
 

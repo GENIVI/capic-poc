@@ -30,14 +30,13 @@ struct cc_server_Smartie {
 
 
 static int cc_Smartie_call_thunk(
-    sd_bus *bus, sd_bus_message *m, void *userdata, sd_bus_error *error)
+    CC_IGNORE_BUS_ARG sd_bus_message *m, void *userdata, sd_bus_error *error)
 {
     int result = 0;
     struct cc_server_Smartie *ii = (struct cc_server_Smartie *) userdata;
     int32_t status = 0;
 
     CC_LOG_DEBUG("invoked cc_Smartie_call_thunk()\n");
-    assert(bus);
     assert(m);
     assert(ii && ii->impl);
     CC_LOG_DEBUG("with path='%s'\n", sd_bus_message_get_path(m));
@@ -75,14 +74,13 @@ static int cc_Smartie_call_thunk(
 }
 
 static int cc_Smartie_hangup_thunk(
-    sd_bus *bus, sd_bus_message *m, void *userdata, sd_bus_error *error)
+    CC_IGNORE_BUS_ARG sd_bus_message *m, void *userdata, sd_bus_error *error)
 {
     int result = 0;
     struct cc_server_Smartie *ii = (struct cc_server_Smartie *) userdata;
     int32_t status = 0;
 
     CC_LOG_DEBUG("invoked cc_Smartie_hangup_thunk()\n");
-    assert(bus);
     assert(m);
     assert(ii && ii->impl);
     CC_LOG_DEBUG("with path='%s'\n", sd_bus_message_get_path(m));

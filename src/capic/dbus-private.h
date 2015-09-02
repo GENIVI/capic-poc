@@ -22,6 +22,20 @@
 extern "C" {
 #endif
 
+/* Assume the stable sd-bus and sd-event API by default. */
+#if !defined(CC_SD_API_VERSION)
+#define CC_SD_API_VERSION 221
+#endif
+
+/* Callback signature sd_bus_message_handler_t changed between the version 219
+ * and 220 to remove the first argument 'sd_bus *bus'.
+ */
+#if CC_SD_API_VERSION >= 220
+#define CC_IGNORE_BUS_ARG
+#else
+#define CC_IGNORE_BUS_ARG sd_bus __attribute__ ((unused)) *b__,
+#endif
+
 enum {
     CC_DBUS_ASYNC_CALL_TIMEOUT_USEC = 2000 * 1000ULL
 };
