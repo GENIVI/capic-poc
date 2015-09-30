@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.genivi.capic.core.feature_0.1.0.qualifier.jar" id="org.genivi.capic.core.feature" version="0.1.0.qualifier">
+      <category name="org.genivi.capic.core.category"/>
+   </feature>
+   <category-def name="org.genivi.capic.core.category" label="GENIVI Common API C Core">
+      <description>
+         GENIVI Common API C Core
+      </description>
+   </category-def>
+</site>
