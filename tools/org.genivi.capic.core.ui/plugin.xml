@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.genivi.capic.core.ui.commands.category"
+            name="Common API C Category">
+      </category>
+      <command
+            categoryId="org.genivi.capic.core.ui.commands.category"
+            id="org.genivi.capic.core.ui.commands.generateCCode"
+            name="Generate C Code">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.genivi.capic.core.ui.handlers.GenerateCCodeHandler"
+            commandId="org.genivi.capic.core.ui.commands.generateCCode">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.genivi.capic.core.ui.commands.generateCCode"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+Alt+C">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <menu
+               id="org.genivi.capic.core.ui.popup.menu"
+               label="Common API">
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.genivi.capic.core.ui.popup.menu">
+         <command
+               commandId="org.genivi.capic.core.ui.commands.generateCCode"
+               label="Generate C Code"
+               style="push">
+            <visibleWhen>
+               <with variable="activeMenuSelection">
+                  <iterate
+                        ifEmpty="false">
+                     <adapt type="org.eclipse.core.resources.IResource">
+                        <test property="org.eclipse.core.resources.name" value="*.fidl" />
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>

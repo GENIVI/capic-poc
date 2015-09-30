@@ -1,0 +1,13 @@
+
+Common API C Tools
+==================
+
+Development with Eclipse IDE
+----------------------------
+Use _Eclipse IDE for Java and DSL Developers_ available from the http://www.eclipse.org[Eclipse Project] or equivalent.  Additionally to this:
+
+* Install _Tycho Configurator_ to support RCP and Eclipse plugin development.  Go to `Preferences > Maven > Discovery` and click on `Open Catalog`.  Find and select the `Tycho Configurator`.
+
+* Install _Eclipse e4 Tools Developer Resources_ to support e4 application development (such as `rcp` file generation).  Install via `Help > Install New Software...` directly from the preconfigured Mars update site.  (For Eclipse releases prior to Mars use http://download.eclipse.org/e4/updates/[].)
+
+Since Maven is considered the primary tool for building Common API C Tools, the content of `.settings/` directories is generally not tracked under version control.  Some subprojects make exception to this rule for certain types of settings.

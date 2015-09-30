@@ -1,0 +1,5 @@
+# Include only selected preferences
+!/.settings/
+/.settings/*
+!/.settings/org.eclipse.jdt.core.prefs
+!/.settings/org.eclipse.jdt.ui.prefs
