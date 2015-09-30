@@ -13,5 +13,17 @@
          </run>
       </application>
    </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.genivi.capic.core.cli.appid"
+            name="capic-core-gen">
+         <property
+               name="appName"
+               value="capic-core-gen">
+         </property>
+      </product>
+   </extension>
 
 </plugin>
