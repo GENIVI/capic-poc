@@ -17,5 +17,7 @@
     <module>../org.genivi.capic.core.updatesite</module>
     <module>../org.genivi.capic.core.cli</module>
     <module>../org.genivi.capic.core.cli.feature</module>
+    <module>../org.genivi.capic.core.target</module>
+    <module>../org.genivi.capic.core.product</module>
   </modules>
 </project>

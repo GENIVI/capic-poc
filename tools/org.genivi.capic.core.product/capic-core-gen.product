@@ -34,6 +34,9 @@
       <feature id="org.genivi.capic.core.cli.feature" version="0.1.0.qualifier"/>
    </features>
 
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+   </configurations>
 
    <preferencesInfo>
       <targetfile overwrite="false"/>
