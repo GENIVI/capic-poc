@@ -17,6 +17,24 @@
       [Enter License Description here.]
    </license>
 
+   <requires>
+      <import plugin="org.eclipse.osgi" version="3.10.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.common" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.registry" version="3.4.0" match="compatible"/>
+      <import plugin="org.eclipse.osgi" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.common" version="3.7.0" match="compatible"/>
+      <import plugin="org.eclipse.core.jobs" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.preferences" version="3.4.0" match="compatible"/>
+      <import plugin="org.eclipse.core.contenttype" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.app" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.preferences" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.registry" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.registry" version="3.6.0" match="equivalent"/>
+      <import plugin="org.eclipse.core.resources" version="3.10.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.11.0" match="greaterOrEqual"/>
+      <import plugin="org.genivi.capic.core" version="0.1.0" match="greaterOrEqual"/>
+   </requires>
+
    <plugin
          id="org.eclipse.equinox.common"
          download-size="0"
@@ -125,6 +143,13 @@
 
    <plugin
          id="org.genivi.capic.core.cli"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.genivi.capic.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
