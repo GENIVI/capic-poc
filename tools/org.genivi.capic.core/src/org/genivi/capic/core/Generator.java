@@ -12,18 +12,30 @@
  */
 package org.genivi.capic.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
 
 public class Generator {
-    private IFile file;
+    private IFile inFile;
+    private IFileMaker fileMaker;
 
-    public Generator(IFile file) {
-        this.file = file;
+    public Generator(IFile inFile, IFileMaker fileMaker) {
+        this.inFile = inFile;
+        this.fileMaker = fileMaker;
     }
 
     public String generate() {
-        IPath path = this.file.getLocation();
-        return path.toPortableString();
+        String dummy = "#include <stdio.h>\nint main(int argc, char *argv[]) {\n  return 0;\n}\n";
+        try {
+            InputStream source = new ByteArrayInputStream(dummy.getBytes("UTF-8"));
+            IFile outFile = fileMaker.makeFile("", "test.c", source);
+            return inFile.getLocation().toPortableString() + "\n"
+                    + outFile.getLocation().toPortableString();
+        } catch (UnsupportedEncodingException e) {
+            return "Failed to decode input string";
+        }
     }
 }

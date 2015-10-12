@@ -49,7 +49,9 @@ public class GenerateCCodeHandler extends AbstractHandler {
         if (!(selection.getFirstElement() instanceof IFile)) {
             return null;
         }
-        Generator generator = new Generator((IFile) selection.getFirstElement());
+        //FIXME: Handle multiple selections
+        IFile file = (IFile) selection.getFirstElement();
+        Generator generator = new Generator(file, new WorkspaceFileMaker(file.getProject()));
         MessageDialog.openInformation(
                 window.getShell(),
                 "Common API C Code Generator UI",

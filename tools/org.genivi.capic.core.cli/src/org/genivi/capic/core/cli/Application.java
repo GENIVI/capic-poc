@@ -64,20 +64,19 @@ public class Application implements IApplication {
         try {
             file.createLink(location, IResource.REPLACE, null);
         } catch (CoreException e) {
-            System.out.println("Unable to link file: " + e.getMessage());
+            System.out.println("Unable to link input file: " + e.getMessage());
             return IApplication.EXIT_OK;
         }
-        System.out.println("File.Location = " + file.getLocation() + "\nFile.FullPath = " + file.getFullPath());
 
-        Generator generator = new Generator(file);
+        Generator generator = new Generator(file, new LocalFileMaker(project));
         System.out.println("Generating Common API C Code for\n" + generator.generate());
 
-        project.close(null);
-        project.delete(IResource.FORCE | IResource.ALWAYS_DELETE_PROJECT_CONTENT, null);
         try {
+            project.close(null);
+            project.delete(IResource.FORCE | IResource.ALWAYS_DELETE_PROJECT_CONTENT, null);
             workspace.save(true, null);
         } catch (CoreException e) {
-            // silently ignore failure to save the workspace
+            // silently ignore failure to clean up and save the workspace
         }
 
         return IApplication.EXIT_OK;
