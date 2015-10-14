@@ -12,6 +12,9 @@
  */
 package org.genivi.capic.core.cli;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -32,6 +35,11 @@ public class Application implements IApplication {
 
     @Override
     public Object start(IApplicationContext context) throws Exception {
+        //FIXME: Make logging configurable
+        BasicConfigurator.configure();
+        Logger logger = Logger.getRootLogger();
+        logger.setLevel(Level.WARN);
+
         System.out.println("GENIVI Common API C Core Standalone Generator");
         final String[] appArgs = (String[]) context.getArguments().get(
             IApplicationContext.APPLICATION_ARGS);
@@ -45,7 +53,7 @@ public class Application implements IApplication {
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
-        System.out.println("WorkspaceRoot.Location = " + root.getLocationURI());
+        //System.out.println("WorkspaceRoot.Location = " + root.getLocationURI());
 
         IProject project = root.getProject("CAPIC Temporary");
         if (!project.exists())

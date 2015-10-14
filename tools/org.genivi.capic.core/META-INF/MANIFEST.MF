@@ -5,5 +5,10 @@ Bundle-SymbolicName: org.genivi.capic.core
 Bundle-Version: 0.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.11.0",
- org.eclipse.core.resources;bundle-version="3.10.0"
+ org.eclipse.core.resources;bundle-version="3.10.0",
+ org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib.macro,
+ com.google.guava,
+ org.eclipse.xtext.xbase.lib,
+ org.franca.core.dsl
 Export-Package: org.genivi.capic.core

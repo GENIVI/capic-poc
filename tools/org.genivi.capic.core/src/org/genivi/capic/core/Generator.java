@@ -17,6 +17,13 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.franca.core.franca.FInterface;
+import org.franca.core.franca.FModel;
+import org.franca.core.dsl.FrancaIDLStandaloneSetup;
 
 public class Generator {
     private IFile inFile;
@@ -27,11 +34,23 @@ public class Generator {
         this.fileMaker = fileMaker;
     }
 
+    protected FModel loadModel(String filename) {
+        FrancaIDLStandaloneSetup.doSetup();
+        ResourceSet resourceSet = new ResourceSetImpl();
+        Resource res = resourceSet.getResource(URI.createFileURI(filename), true);
+        FModel root = (FModel)res.getContents().get(0);
+        return root;
+}
+
     public String generate() {
-        String dummy = "#include <stdio.h>\nint main(int argc, char *argv[]) {\n  return 0;\n}\n";
+        FModel model = loadModel(inFile.getLocation().toString());
+        FInterface ifs = model.getInterfaces().get(0);
+        XGenerator xgen = new XGenerator();
+        String code = xgen.generateInterface(ifs).toString();
         try {
-            InputStream source = new ByteArrayInputStream(dummy.getBytes("UTF-8"));
-            IFile outFile = fileMaker.makeFile("", "test.c", source);
+            //FIXME: Make output file encoding configurable or use system settings
+            InputStream source = new ByteArrayInputStream(code.getBytes("UTF-8"));
+            IFile outFile = fileMaker.makeFile("", ifs.getName() + ".h", source);
             return inFile.getLocation().toPortableString() + "\n"
                     + outFile.getLocation().toPortableString();
         } catch (UnsupportedEncodingException e) {

@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.genivi.capic.core.Generator;
 
@@ -52,10 +51,7 @@ public class GenerateCCodeHandler extends AbstractHandler {
         //FIXME: Handle multiple selections
         IFile file = (IFile) selection.getFirstElement();
         Generator generator = new Generator(file, new WorkspaceFileMaker(file.getProject()));
-        MessageDialog.openInformation(
-                window.getShell(),
-                "Common API C Code Generator UI",
-                "Generating Common API C Code for\n" + generator.generate());
+        generator.generate();
         return null;
     }
 }

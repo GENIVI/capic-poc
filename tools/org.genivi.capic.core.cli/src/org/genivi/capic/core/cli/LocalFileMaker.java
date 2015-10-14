@@ -42,9 +42,11 @@ public class LocalFileMaker implements IFileMaker {
             if (!parent.isOpen())
                 parent.open(null);
             IFolder folder = parent.getFolder(SRCGEN_FOLDER);
-            folder.createLink(
-                    new Path(fullPathName),
-                    IResource.FORCE | IResource.DERIVED | IResource.ALLOW_MISSING_LOCAL, null);
+            if (!folder.exists()) {
+                folder.createLink(
+                        new Path(fullPathName),
+                        IResource.FORCE | IResource.DERIVED | IResource.ALLOW_MISSING_LOCAL, null);
+            }
             IFile file = folder.getFile(fileName);
             if (file.exists())
                 file.delete(IResource.FORCE, null);
@@ -54,6 +56,7 @@ public class LocalFileMaker implements IFileMaker {
             file.setContents(source, IResource.FORCE, null);
             return file;
         } catch (CoreException e) {
+            //FIXME: re-throw
             System.out.println("Unable to link output folder or file: " + e.getMessage());
             return null;
         }

@@ -7,17 +7,23 @@
 
   <properties>
     <tycho.version>0.23.0</tycho.version>
+    <xtend-version>2.8.4</xtend-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <eclipse-mars-repo.url>http://download.eclipse.org/releases/mars</eclipse-mars-repo.url>
+    <sonatype-repo.url>http://repository.sonatype.org/content/groups/sonatype-public-grid/</sonatype-repo.url>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>eclipse-mars</id>
-      <url>${eclipse-mars-repo.url}</url>
-      <layout>p2</layout>
-    </repository>
-  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>sonatype</id>
+      <url>${sonatype-repo.url}</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 
   <build>
     <plugins>
@@ -67,6 +73,21 @@
             </environment>
           </environments>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.xtend</groupId>
+        <artifactId>xtend-maven-plugin</artifactId>
+        <version>${xtend-version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/xtend-gen</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
