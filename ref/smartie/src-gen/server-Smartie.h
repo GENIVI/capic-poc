@@ -11,10 +11,11 @@
  * For further information see http://www.genivi.org/.
  */
 
-#ifndef INCLUDED_SERVER_SERVICE
-#define INCLUDED_SMARTIE_SERVICE
+#ifndef INCLUDED_SERVER_SMARTIE
+#define INCLUDED_SERVER_SMARTIE
 
 #include <stdint.h>
+#include <stdbool.h>
 
 
 #ifdef __cplusplus
@@ -23,11 +24,11 @@ extern "C" {
 
 struct cc_server_Smartie;
 
-typedef int (*cc_Smartie_call_t)(struct cc_server_Smartie *instance, int32_t *status);
+typedef int (*cc_Smartie_ring_t)(struct cc_server_Smartie *instance, int32_t *status);
 typedef int (*cc_Smartie_hangup_t)(struct cc_server_Smartie *instance, int32_t *status);
 
 struct cc_server_Smartie_impl {
-    cc_Smartie_call_t call;
+    cc_Smartie_ring_t ring;
     cc_Smartie_hangup_t hangup;
 };
 
@@ -43,4 +44,4 @@ void *cc_server_Smartie_get_data(struct cc_server_Smartie *instance);
 #endif
 
 
-#endif /* ifndef INCLUDED_SMARTIE_SERVICE */
+#endif /* ifndef INCLUDED_SERVER_SMARTIE */

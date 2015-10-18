@@ -21,17 +21,17 @@
 #include "src-gen/client-Smartie.h"
 
 
-enum smartie_state {SMARTIE_IDLE, SMARTIE_DIALING, SMARTIE_CALLING};
+enum smartie_state {SMARTIE_IDLE, SMARTIE_DIALING, SMARTIE_RINGING};
 static enum smartie_state bob_state = SMARTIE_IDLE;
 
-static int Smartie_impl_call(struct cc_server_Smartie *instance, int32_t *status)
+static int Smartie_impl_ring(struct cc_server_Smartie *instance, int32_t *status)
 {
-    CC_LOG_DEBUG("invoked Smartie_impl_call()\n");
+    CC_LOG_DEBUG("invoked Smartie_impl_ring()\n");
     assert(instance);
     assert(status);
     if (bob_state == SMARTIE_IDLE) {
         *status = 0;
-        bob_state = SMARTIE_CALLING;
+        bob_state = SMARTIE_RINGING;
     } else
         *status = 1;
     CC_LOG_DEBUG("returning status=%d\n", *status);
@@ -44,7 +44,7 @@ static int Smartie_impl_hangup(struct cc_server_Smartie *instance, int32_t *stat
     CC_LOG_DEBUG("invoked Smartie_impl_hangup()\n");
     assert(instance);
     assert(status);
-    if (bob_state == SMARTIE_CALLING) {
+    if (bob_state == SMARTIE_RINGING) {
         *status = 0;
         bob_state = SMARTIE_IDLE;
     } else
@@ -55,7 +55,7 @@ static int Smartie_impl_hangup(struct cc_server_Smartie *instance, int32_t *stat
 }
 
 static struct cc_server_Smartie_impl bob_impl = {
-    .call = &Smartie_impl_call,
+    .ring = &Smartie_impl_ring,
     .hangup = &Smartie_impl_hangup
 };
 

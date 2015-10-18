@@ -29,14 +29,14 @@ struct cc_server_Smartie {
 };
 
 
-static int cc_Smartie_call_thunk(
+static int cc_Smartie_ring_thunk(
     CC_IGNORE_BUS_ARG sd_bus_message *m, void *userdata, sd_bus_error *error)
 {
     int result = 0;
     struct cc_server_Smartie *ii = (struct cc_server_Smartie *) userdata;
-    int32_t status = 0;
+    int32_t status;
 
-    CC_LOG_DEBUG("invoked cc_Smartie_call_thunk()\n");
+    CC_LOG_DEBUG("invoked cc_Smartie_ring_thunk()\n");
     assert(m);
     assert(ii && ii->impl);
     CC_LOG_DEBUG("with path='%s'\n", sd_bus_message_get_path(m));
@@ -46,15 +46,15 @@ static int cc_Smartie_call_thunk(
         CC_LOG_ERROR("unable to read method parameters: %s\n", strerror(-result));
         return result;
     }
-    if (!ii->impl->call) {
-        CC_LOG_ERROR("unsupported method invoked: %s\n", "Smartie.call");
+    if (!ii->impl->ring) {
+        CC_LOG_ERROR("unsupported method invoked: %s\n", "Smartie.ring");
         sd_bus_error_set(
             error, SD_BUS_ERROR_NOT_SUPPORTED,
-            "instance does not support method Smartie.call");
+            "instance does not support method Smartie.ring");
         sd_bus_reply_method_error(m, error);
         return -ENOTSUP;
     }
-    result = ii->impl->call(ii, &status);
+    result = ii->impl->ring(ii, &status);
     if (result < 0) {
         CC_LOG_ERROR("failed to execute method: %s\n", strerror(-result));
         sd_bus_error_setf(
@@ -78,7 +78,7 @@ static int cc_Smartie_hangup_thunk(
 {
     int result = 0;
     struct cc_server_Smartie *ii = (struct cc_server_Smartie *) userdata;
-    int32_t status = 0;
+    int32_t status;
 
     CC_LOG_DEBUG("invoked cc_Smartie_hangup_thunk()\n");
     assert(m);
@@ -119,7 +119,7 @@ static int cc_Smartie_hangup_thunk(
 
 static const sd_bus_vtable vtable_Smartie[] = {
     SD_BUS_VTABLE_START(0),
-    SD_BUS_METHOD("call", "", "i", &cc_Smartie_call_thunk, 0),
+    SD_BUS_METHOD("ring", "", "i", &cc_Smartie_ring_thunk, 0),
     SD_BUS_METHOD("hangup", "", "i", &cc_Smartie_hangup_thunk, 0),
     SD_BUS_VTABLE_END
 };

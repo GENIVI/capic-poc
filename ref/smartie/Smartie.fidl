@@ -15,7 +15,7 @@ package org.genivi.capic
 
 interface Smartie {
     version {major 0 minor 1}
-    method call {
+    method ring {
         out {
             Int32 status
         }

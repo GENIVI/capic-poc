@@ -21,12 +21,12 @@
 #include "src-gen/client-Smartie.h"
 
 
-enum smartie_state {SMARTIE_IDLE, SMARTIE_DIALING, SMARTIE_CALLING};
+enum smartie_state {SMARTIE_IDLE, SMARTIE_DIALING, SMARTIE_RINGING};
 static enum smartie_state alice_state = SMARTIE_IDLE;
 
-static int Smartie_impl_call(struct cc_server_Smartie *instance, int32_t *status)
+static int Smartie_impl_ring(struct cc_server_Smartie *instance, int32_t *status)
 {
-    CC_LOG_DEBUG("invoked Smartie_impl_call()\n");
+    CC_LOG_DEBUG("invoked Smartie_impl_ring()\n");
     assert(instance);
     assert(status);
     *status = 0;
@@ -47,19 +47,19 @@ static int Smartie_impl_hangup(struct cc_server_Smartie *instance, int32_t *stat
 }
 
 static struct cc_server_Smartie_impl alice_impl = {
-    .call = &Smartie_impl_call,
+    .ring = &Smartie_impl_ring,
     .hangup = &Smartie_impl_hangup
 };
 
-static void complete_Smartie_call(struct cc_client_Smartie *instance, int32_t status)
+static void complete_Smartie_ring(struct cc_client_Smartie *instance, int32_t status)
 {
-    CC_LOG_DEBUG("invoked complete_Smartie_call()\n");
+    CC_LOG_DEBUG("invoked complete_Smartie_ring()\n");
     CC_LOG_DEBUG("with status=%d\n", status);
     assert(instance);
 
-    printf("status=%d returned by bob.call()\n", status);
+    printf("status=%d returned by bob.ring()\n", status);
     if (status == 0) {
-        alice_state = SMARTIE_CALLING;
+        alice_state = SMARTIE_RINGING;
         /* FIXME: continue with the script */
     } else {
         alice_state = SMARTIE_IDLE;
@@ -158,10 +158,10 @@ int main(int argc, char *argv[])
         goto fail;
     }
 
-    printf("invoking asynchronously method bob.call()\n");
-    result = cc_Smartie_call_async(bob, &complete_Smartie_call);
+    printf("invoking asynchronously method bob.ring()\n");
+    result = cc_Smartie_ring_async(bob, &complete_Smartie_ring);
     if (result < 0) {
-        printf("unable to issue cc_Smartie_call_async(): %s\n", strerror(-result));
+        printf("unable to issue cc_Smartie_ring_async(): %s\n", strerror(-result));
         goto fail;
     }
 

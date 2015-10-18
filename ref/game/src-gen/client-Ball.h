@@ -26,7 +26,7 @@ struct cc_client_Ball;
 
 typedef void (*cc_Ball_grab_reply_t)(struct cc_client_Ball *instance, bool success);
 
-int cc_Ball_grab(struct cc_client_Ball *instance, bool *succes);
+int cc_Ball_grab(struct cc_client_Ball *instance, bool *success);
 int cc_Ball_grab_async(struct cc_client_Ball *instance, cc_Ball_grab_reply_t callback);
 
 int cc_Ball_drop(struct cc_client_Ball *instance);

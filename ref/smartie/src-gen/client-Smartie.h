@@ -11,10 +11,11 @@
  * For further information see http://www.genivi.org/.
  */
 
-#ifndef INCLUDED_CLIENT_SERVICE
+#ifndef INCLUDED_CLIENT_SMARTIE
 #define INCLUDED_CLIENT_SMARTIE
 
 #include <stdint.h>
+#include <stdbool.h>
 
 
 #ifdef __cplusplus
@@ -23,15 +24,16 @@ extern "C" {
 
 struct cc_client_Smartie;
 
-typedef void (*cc_Smartie_call_reply_t)(
+typedef void (*cc_Smartie_ring_reply_t)(
     struct cc_client_Smartie *instance, int32_t status);
 typedef void (*cc_Smartie_hangup_reply_t)(
     struct cc_client_Smartie *instance, int32_t status);
 
-int cc_Smartie_call(
+int cc_Smartie_ring(
     struct cc_client_Smartie *instance, int32_t *status);
-int cc_Smartie_call_async(
-    struct cc_client_Smartie *instance, cc_Smartie_call_reply_t callback);
+int cc_Smartie_ring_async(
+    struct cc_client_Smartie *instance, cc_Smartie_ring_reply_t callback);
+
 int cc_Smartie_hangup(
     struct cc_client_Smartie *instance, int32_t *status);
 int cc_Smartie_hangup_async(

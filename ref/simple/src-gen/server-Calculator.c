@@ -34,9 +34,9 @@ static int cc_Calculator_split_thunk(
 {
     int result = 0;
     struct cc_server_Calculator *ii = (struct cc_server_Calculator *) userdata;
-    double value = 0;
-    int32_t whole = 0;
-    int32_t fraction = 0;
+    double value;
+    int32_t whole;
+    int32_t fraction;
 
     CC_LOG_DEBUG("invoked cc_Calculator_split_thunk()\n");
     assert(m);
@@ -75,7 +75,7 @@ static int cc_Calculator_split_thunk(
     return 1;
 }
 
-static const sd_bus_vtable vtable_Service[] = {
+static const sd_bus_vtable vtable_Calculator[] = {
     SD_BUS_VTABLE_START(0),
     SD_BUS_METHOD("split", "d", "ii", &cc_Calculator_split_thunk, 0),
     SD_BUS_VTABLE_END
@@ -110,7 +110,7 @@ int cc_server_Calculator_new(
     ii->data = data;
 
     result = sd_bus_add_object_vtable(
-        i->backend->bus, &ii->vtable_slot, i->path, i->interface, vtable_Service, ii);
+        i->backend->bus, &ii->vtable_slot, i->path, i->interface, vtable_Calculator, ii);
     if (result < 0) {
         CC_LOG_ERROR("unable to initialize instance vtable: %s\n", strerror(-result));
         goto fail;

@@ -34,7 +34,7 @@ static int cc_Ball_grab_thunk(
 {
     int result = 0;
     struct cc_server_Ball *ii = (struct cc_server_Ball *) userdata;
-    bool success = false;
+    bool success;
 
     CC_LOG_DEBUG("invoked cc_Ball_grab_thunk()\n");
     assert(m);
@@ -63,7 +63,7 @@ static int cc_Ball_grab_thunk(
         sd_bus_reply_method_error(m, error);
         return result;
     }
-    result = sd_bus_reply_method_return(m, "b", success);
+    result = sd_bus_reply_method_return(m, "b", (int) success);
     if (result < 0) {
         CC_LOG_ERROR("unable to send method reply: %s\n", strerror(-result));
         return result;

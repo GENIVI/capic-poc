@@ -78,7 +78,8 @@ static int cc_Calculator_split_reply_thunk(
     int result = 0;
     sd_bus *bus;
     struct cc_client_Calculator *ii = (struct cc_client_Calculator *) userdata;
-    int32_t whole = 0, fraction = 0;
+    int32_t whole;
+    int32_t fraction;
 
     CC_LOG_DEBUG("invoked cc_Calculator_split_reply_thunk()\n");
     assert(message);
