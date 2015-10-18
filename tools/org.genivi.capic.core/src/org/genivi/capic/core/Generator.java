@@ -28,6 +28,9 @@ import org.franca.core.dsl.FrancaIDLStandaloneSetup;
 public class Generator {
     private IFile inFile;
     private IFileMaker fileMaker;
+    private final int MAX_SPACES_PER_TAB = 16;
+    private final String SPACES = "                 ";
+    private int spacesPerTab = 4;
 
     public Generator(IFile inFile, IFileMaker fileMaker) {
         this.inFile = inFile;
@@ -40,19 +43,30 @@ public class Generator {
         Resource res = resourceSet.getResource(URI.createFileURI(filename), true);
         FModel root = (FModel)res.getContents().get(0);
         return root;
-}
+    }
+
+    protected IFile writeFile(String name, String contents) throws UnsupportedEncodingException
+    {
+        //FIXME: Make indentation configurable
+        if (spacesPerTab >= 0 && spacesPerTab <= MAX_SPACES_PER_TAB) {
+            String tabExpansion = SPACES.substring(0, spacesPerTab);
+            contents = contents.replaceAll("[\t]", tabExpansion);
+        }
+        //FIXME: Make output file encoding configurable or use system settings
+        InputStream source = new ByteArrayInputStream(contents.getBytes("UTF-8"));
+        return fileMaker.makeFile("", name, source);
+    }
 
     public String generate() {
         FModel model = loadModel(inFile.getLocation().toString());
         FInterface ifs = model.getInterfaces().get(0);
         XGenerator xgen = new XGenerator();
-        String code = xgen.generateInterface(ifs).toString();
         try {
-            //FIXME: Make output file encoding configurable or use system settings
-            InputStream source = new ByteArrayInputStream(code.getBytes("UTF-8"));
-            IFile outFile = fileMaker.makeFile("", ifs.getName() + ".h", source);
-            return inFile.getLocation().toPortableString() + "\n"
-                    + outFile.getLocation().toPortableString();
+            writeFile("client-" + ifs.getName() + ".h", xgen.generateClientInterfaceHeader(ifs).toString());
+            writeFile("client-" + ifs.getName() + ".c", xgen.generateClientInterfaceBody(ifs).toString());
+            writeFile("server-" + ifs.getName() + ".h", xgen.generateServerInterfaceHeader(ifs).toString());
+            writeFile("server-" + ifs.getName() + ".c", xgen.generateServerInterfaceBody(ifs).toString());
+            return "Successfully generated code for " + inFile.getLocation().toPortableString();
         } catch (UnsupportedEncodingException e) {
             return "Failed to decode input string";
         }
