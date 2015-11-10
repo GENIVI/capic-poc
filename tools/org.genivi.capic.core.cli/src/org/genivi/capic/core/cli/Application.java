@@ -27,14 +27,18 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.franca.core.dsl.FrancaIDLStandaloneSetup;
 import org.genivi.capic.core.Generator;
+import com.google.inject.Injector;
 
 public class Application implements IApplication {
-
-    static private String usageText = "Usage:\ncapic-core-gen <fidl-file>";
+    private static String usageText = "Usage:\ncapic-core-gen <fidl-file>";
+    private Injector injector;
 
     @Override
     public Object start(IApplicationContext context) throws Exception {
+        injector = new FrancaIDLStandaloneSetup().createInjectorAndDoEMFRegistration();
+
         //FIXME: Make logging configurable
         BasicConfigurator.configure();
         Logger logger = Logger.getRootLogger();
@@ -76,8 +80,8 @@ public class Application implements IApplication {
             return IApplication.EXIT_OK;
         }
 
-        Generator generator = new Generator(file, new LocalFileMaker(project));
-        System.out.println("Generating Common API C Code for\n" + generator.generate());
+        Generator generator = injector.getInstance(Generator.class);
+        System.out.println(generator.generate(file, new LocalFileMaker(project)));
 
         try {
             project.close(null);

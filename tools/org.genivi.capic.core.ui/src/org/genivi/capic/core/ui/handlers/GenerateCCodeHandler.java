@@ -12,6 +12,8 @@
  */
 package org.genivi.capic.core.ui.handlers;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -28,6 +30,8 @@ import org.genivi.capic.core.Generator;
  * @see org.eclipse.core.commands.AbstractHandler
  */
 public class GenerateCCodeHandler extends AbstractHandler {
+    @Inject Generator generator;
+
     /**
      * The constructor.
      */
@@ -48,10 +52,10 @@ public class GenerateCCodeHandler extends AbstractHandler {
         if (!(selection.getFirstElement() instanceof IFile)) {
             return null;
         }
+
         //FIXME: Handle multiple selections
         IFile file = (IFile) selection.getFirstElement();
-        Generator generator = new Generator(file, new WorkspaceFileMaker(file.getProject()));
-        generator.generate();
+        generator.generate(file, new WorkspaceFileMaker(file.getProject()));
         return null;
     }
 }

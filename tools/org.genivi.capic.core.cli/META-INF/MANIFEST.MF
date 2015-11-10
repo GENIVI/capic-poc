@@ -7,5 +7,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: org.eclipse.equinox.app,
  org.eclipse.core.resources,
  org.apache.log4j,
- org.genivi.capic.core;bundle-version="0.1.0"
-Import-Package: org.eclipse.core.runtime
+ org.genivi.capic.core;bundle-version="0.1.0",
+ com.google.inject;bundle-version="3.0.0"
+Import-Package: org.eclipse.core.runtime,
+ org.franca.core.dsl

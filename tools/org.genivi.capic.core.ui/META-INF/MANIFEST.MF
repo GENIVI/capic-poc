@@ -3,8 +3,12 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Common API C Code Generator UI
 Bundle-SymbolicName: org.genivi.capic.core.ui;singleton:=true
 Bundle-Version: 0.1.0.qualifier
+Bundle-Activator: org.genivi.capic.core.ui.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
- org.genivi.capic.core;bundle-version="0.1.0"
+ org.genivi.capic.core;bundle-version="0.1.0",
+ org.franca.core.dsl.ui;bundle-version="0.10.0",
+ org.eclipse.xtext.ui;bundle-version="2.8.4"
