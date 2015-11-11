@@ -12,6 +12,7 @@
 
   <modules>
     <module>../org.genivi.capic.core</module>
+    <module>../org.genivi.capic.core.test</module>
     <module>../org.genivi.capic.core.ui</module>
     <module>../org.genivi.capic.core.feature</module>
     <module>../org.genivi.capic.core.updatesite</module>
