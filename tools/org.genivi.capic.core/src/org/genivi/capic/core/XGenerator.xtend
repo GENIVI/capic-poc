@@ -17,6 +17,8 @@ import org.franca.core.franca.FInterface
 import org.franca.core.franca.FMethod
 import org.franca.core.franca.FTypedElement
 import org.franca.core.franca.FTypeRef
+import org.franca.core.franca.FArgument
+import org.eclipse.emf.common.util.EList
 
 class XGenerator {
 
@@ -38,14 +40,14 @@ class XGenerator {
 
 		«FOR m : api.methods»
 		«IF !m.fireAndForget»
-		typedef void (*cc_«api.name»_«m.name»_reply_t)(«api.clientTypeSignature» *instance«m.replyOutArguments»);
+		typedef void (*«m.clientReplyTypeName»)(«api.clientTypeSignature» *instance«m.outArgs.byVal»);
 		«ENDIF»
 		«ENDFOR»
 
 		«FOR m : api.methods»
-		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArguments»«m.outArguments»);
+		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArgs.byVal»«m.outArgs.byRef»);
 		«IF !m.fireAndForget»
-		int cc_«api.name»_«m.name»_async(«api.clientTypeSignature» *instance«m.inArguments», cc_«api.name»_«m.name»_reply_t callback);
+		int cc_«api.name»_«m.name»_async(«api.clientTypeSignature» *instance«m.inArgs.byVal», «m.clientReplyTypeName» callback);
 		«ENDIF»
 
 		«ENDFOR»
@@ -81,7 +83,7 @@ class XGenerator {
 			void *data;
 			«FOR m : api.methods»
 			«IF !m.fireAndForget»
-			cc_«api.name»_«m.name»_reply_t «m.name»_reply_callback;
+			«m.clientReplyTypeName» «m.name»_reply_callback;
 			sd_bus_slot *«m.name»_reply_slot;
 			«ENDIF»
 			«ENDFOR»
@@ -134,7 +136,7 @@ class XGenerator {
 		}
 		«ELSE»
 
-		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArguments»«m.outArguments»)
+		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArgs.byVal»«m.outArgs.byRef»)
 		{
 			int result = 0;
 			struct cc_instance *i;
@@ -193,7 +195,7 @@ class XGenerator {
 			return result;
 		}
 
-		static int cc_«api.name»_«m.name»_reply_thunk(CC_IGNORE_BUS_ARG sd_bus_message *message, void *userdata, sd_bus_error *ret_error)
+		static int «m.clientReplyThunkName»(CC_IGNORE_BUS_ARG sd_bus_message *message, void *userdata, sd_bus_error *ret_error)
 		{
 			int result = 0;
 			sd_bus *bus;
@@ -210,7 +212,7 @@ class XGenerator {
 			«ENDIF»
 			«ENDFOR»
 
-			CC_LOG_DEBUG("invoked cc_«api.name»_«m.name»_reply_thunk()\n");
+			CC_LOG_DEBUG("invoked «m.clientReplyThunkName»()\n");
 			assert(message);
 			bus = sd_bus_message_get_bus(message);
 			assert(bus);
@@ -227,7 +229,7 @@ class XGenerator {
 				CC_LOG_ERROR("unable to get reply value: %s\n", strerror(-result));
 				goto finish;
 			}
-			CC_LOG_DEBUG("invoking callback in cc_«api.name»_«m.name»_reply_thunk()\n");
+			CC_LOG_DEBUG("invoking callback in «m.clientReplyThunkName»()\n");
 			CC_LOG_DEBUG("with «m.outArgumentsAsDBusLogFormat»\n"«m.outArgumentsAsDBusReply»);
 			ii->«m.name»_reply_callback(ii«m.outArgumentsAsDBusReply»);
 			result = 1;
@@ -239,7 +241,7 @@ class XGenerator {
 			return result;
 		}
 
-		int cc_«api.name»_«m.name»_async(«api.clientTypeSignature» *instance«m.inArguments», cc_«api.name»_«m.name»_reply_t callback)
+		int cc_«api.name»_«m.name»_async(«api.clientTypeSignature» *instance«m.inArgs.byVal», «m.clientReplyTypeName» callback)
 		{
 			int result = 0;
 			struct cc_instance *i;
@@ -271,7 +273,7 @@ class XGenerator {
 			}
 
 			result = sd_bus_call_async(
-				i->backend->bus, &instance->«m.name»_reply_slot, message, &cc_«api.name»_«m.name»_reply_thunk,
+				i->backend->bus, &instance->«m.name»_reply_slot, message, &«m.clientReplyThunkName»,
 				instance, CC_DBUS_ASYNC_CALL_TIMEOUT_USEC);
 			if (result < 0) {
 				CC_LOG_ERROR("unable to issue method call: %s\n", strerror(-result));
@@ -358,7 +360,7 @@ class XGenerator {
 		«api.serverTypeSignature»;
 
 		«FOR m : api.methods»
-		typedef int (*cc_«api.name»_«m.name»_t)(«api.serverTypeSignature» *instance«m.inArguments»«m.outArguments»);
+		typedef int (*cc_«api.name»_«m.name»_t)(«api.serverTypeSignature» *instance«m.inArgs.byVal»«m.outArgs.byRef»);
 		«ENDFOR»
 
 		«api.serverImplTypeSignature» {
@@ -397,13 +399,13 @@ class XGenerator {
 		«api.serverTypeSignature» {
 			struct cc_instance *instance;
 			void *data;
-			const struct cc_server_«api.name»_impl *impl;
+			const «api.serverImplTypeSignature» *impl;
 			struct sd_bus_slot *vtable_slot;
 		};
 
 		«FOR m : api.methods»
 
-		static int cc_«api.name»_«m.name»_thunk(CC_IGNORE_BUS_ARG sd_bus_message *m, void *userdata, sd_bus_error *error)
+		static int «m.serverThunkName»(CC_IGNORE_BUS_ARG sd_bus_message *m, void *userdata, sd_bus_error *error)
 		{
 			int result = 0;
 			«api.serverTypeSignature» *ii = («api.serverTypeSignature» *) userdata;
@@ -422,7 +424,7 @@ class XGenerator {
 			«a.type.typeSignature»«a.name»;
 			«ENDFOR»
 
-			CC_LOG_DEBUG("invoked cc_«api.name»_«m.name»_thunk()\n");
+			CC_LOG_DEBUG("invoked «m.serverThunkName»()\n");
 			assert(m);
 			assert(ii && ii->impl);
 			CC_LOG_DEBUG("with path='%s'\n", sd_bus_message_get_path(m));
@@ -461,7 +463,7 @@ class XGenerator {
 		static const sd_bus_vtable vtable_«api.name»[] = {
 			SD_BUS_VTABLE_START(0),
 			«FOR m : api.methods»
-			SD_BUS_METHOD("«m.name»", «m.inSignaturesAsDBus», «m.outSignaturesAsDBus», &cc_«api.name»_«m.name»_thunk, «IF m.fireAndForget»SD_BUS_VTABLE_METHOD_NO_REPLY«ELSE»0«ENDIF»),
+			SD_BUS_METHOD("«m.name»", «m.inSignaturesAsDBus», «m.outSignaturesAsDBus», &«m.serverThunkName», «IF m.fireAndForget»SD_BUS_VTABLE_METHOD_NO_REPLY«ELSE»0«ENDIF»),
 			«ENDFOR»
 			SD_BUS_VTABLE_END
 		};
@@ -530,52 +532,60 @@ class XGenerator {
 		/* This file is created by Common API C code generator automatically. */'''
 
 
-	def clientTypeSignature(FInterface it) '''
-		struct cc_client_«it.name»'''
-
-
 	def clientHeaderGuard(FInterface it) '''
 		INCLUDED_CLIENT_«it.name.toUpperCase»'''
+
+
+	def clientTypeSignature(FInterface it) '''
+		struct cc_client_«it.name»'''
 
 
 	def clientMethodPrefix(FInterface it) '''
 		cc_client_«it.name»'''
 
 
-	def serverTypeSignature(FInterface it) '''
-		struct cc_server_«it.name»'''
+	def clientReplyTypeName(FMethod it) '''
+		cc_«it.apiName»_«it.name»_reply_t'''
 
 
-	def serverImplTypeSignature(FInterface it) '''
-		struct cc_server_«it.name»_impl'''
+	def clientReplyThunkName(FMethod it) '''
+		cc_«it.apiName»_«it.name»_reply_thunk'''
 
 
 	def serverHeaderGuard(FInterface it) '''
 		INCLUDED_SERVER_«it.name.toUpperCase»'''
 
 
+	def serverTypeSignature(FInterface it) '''
+		struct cc_server_«it.name»'''
+
+
 	def serverMethodPrefix(FInterface it) '''
 		cc_server_«it.name»'''
 
 
-	def inArguments(FMethod it) '''
-		«FOR a : inArgs», «a.type.typeSignatureIn»«a.name»«ENDFOR»'''
+	def serverImplTypeSignature(FInterface it) '''
+		struct cc_server_«it.name»_impl'''
 
 
-	def outArguments(FMethod it) '''
-		«FOR a : outArgs», «a.type.typeSignatureOut»«a.name»«ENDFOR»'''
+	def serverThunkName(FMethod it) '''
+		cc_«it.apiName»_«it.name»_thunk'''
 
 
-	def replyOutArguments(FMethod it) '''
-		«FOR a : outArgs», «a.type.typeSignatureIn»«a.name»«ENDFOR»'''
+	def byVal(EList<FArgument> it) '''
+		«FOR a : it», «a.type.byVal»«a.name»«ENDFOR»'''
 
 
-	def typeSignatureIn(FTypeRef it) {
+	def byRef(EList<FArgument> it) '''
+		«FOR a : it», «a.type.byRef»«a.name»«ENDFOR»'''
+
+
+	def byVal(FTypeRef it) {
 		typeSignature
 	}
 
 
-	def typeSignatureOut(FTypeRef it) {
+	def byRef(FTypeRef it) {
 		typeSignature + "*"
 	}
 
@@ -599,6 +609,22 @@ class XGenerator {
 		} else {
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
 		}
+	}
+
+
+	def apiName(FMethod it) {
+		var api = it.eContainer()
+		api.eGet(api.eClass().getEStructuralFeature("name"))
+	}
+
+
+	def inArgs(FMethod it) {
+		getInArgs()
+	}
+
+
+	def outArgs(FMethod it) {
+		getOutArgs()
 	}
 
 
