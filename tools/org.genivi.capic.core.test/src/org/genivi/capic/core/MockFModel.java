@@ -23,21 +23,11 @@ import org.franca.core.franca.FrancaFactory;
 
 public class MockFModel {
 
-    public static class Argument {
-        public FTypeRef typeRef;
-        public String name;
-        public Argument(FBasicTypeId typeId, String name) {
-            this.typeRef = FrancaFactory.eINSTANCE.createFTypeRef();
-            this.typeRef.setPredefined(typeId);
-            this.name = name;
-        }
-    }
-
     public static FInterface makeInterface(String name) {
         return makeInterface(name, null);
     }
 
-    public static FInterface makeInterface(String name, FMethod[] methods) {
+    public static FInterface makeInterface(String name, Iterable<FMethod> methods) {
         FInterface result = FrancaFactory.eINSTANCE.createFInterface();
         if (name != null)
             result.setName(name);
@@ -46,7 +36,7 @@ public class MockFModel {
         return result;
     }
 
-    private static void setMethods(FInterface api, FMethod[] methods) {
+    private static void setMethods(FInterface api, Iterable<FMethod> methods) {
         BasicEList<FMethod> ms = new BasicEList<FMethod>();
         assert(methods != null);
         for (FMethod m : methods)
@@ -54,11 +44,19 @@ public class MockFModel {
         api.eSet(api.eClass().getEStructuralFeature("methods"), ms);
     }
 
-    public static FMethod makeMethod(Argument[] inArgs, Argument[] outArgs) {
-        return makeMethod(null, inArgs, outArgs);
+    public static FMethod makeMethod(String name) {
+        return makeMethod(name, (Iterable<FArgument>)null, (Iterable<FArgument>)null, false);
     }
 
-    public static FMethod makeMethod(String name, Argument[] inArgs, Argument[] outArgs) {
+    public static FMethod makeMethod(Iterable<FArgument> inArgs, Iterable<FArgument> outArgs) {
+        return makeMethod(null, inArgs, outArgs, false);
+    }
+
+    public static FMethod makeMethod(String name, Iterable<FArgument> inArgs, Iterable<FArgument> outArgs) {
+        return makeMethod(name, inArgs, outArgs, false);
+    }
+
+    public static FMethod makeMethod(String name, Iterable<FArgument> inArgs, Iterable<FArgument> outArgs, boolean isFireAndForget) {
         FMethod result = FrancaFactory.eINSTANCE.createFMethod();
         if (name != null)
             result.setName(name);
@@ -66,18 +64,33 @@ public class MockFModel {
             result.eSet(result.eClass().getEStructuralFeature("inArgs"), makeArgList(inArgs));
         if (outArgs != null)
             result.eSet(result.eClass().getEStructuralFeature("outArgs"), makeArgList(outArgs));
+        result.setFireAndForget(isFireAndForget);
         return result;
     }
 
-    private static EList<FArgument> makeArgList(Argument[] args) {
-        assert(args != null);
+    public static EList<FArgument> makeArgList(Iterable<FArgument> args) {
         BasicEList<FArgument> result = new BasicEList<FArgument>();
-        for (Argument a : args) {
-            FArgument fa = FrancaFactory.eINSTANCE.createFArgument();
-            fa.setName(a.name);
-            fa.setType(a.typeRef);
-            result.add(fa);
-        }
+        if (args == null)
+            return result;
+        for (FArgument a : args)
+            result.add(a);
+        return result;
+    }
+
+    public static FArgument makeArgument(FBasicTypeId typeId, String name) {
+        return makeArgument(makeTypeRef(typeId), name);
+    }
+
+    public static FArgument makeArgument(FTypeRef typeRef, String name) {
+        FArgument result = FrancaFactory.eINSTANCE.createFArgument();
+        result.setName(name);
+        result.setType(typeRef);
+        return result;
+    }
+
+    public static FTypeRef makeTypeRef(FBasicTypeId typeId) {
+        FTypeRef result = FrancaFactory.eINSTANCE.createFTypeRef();
+        result.eSet(result.eClass().getEStructuralFeature("predefined"), typeId);
         return result;
     }
 }

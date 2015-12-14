@@ -12,15 +12,52 @@
  */
 package org.genivi.capic.core
 
+import static org.genivi.capic.core.XGenerator.Domain.*
+
 import org.franca.core.franca.FBasicTypeId
 import org.franca.core.franca.FInterface
 import org.franca.core.franca.FMethod
-import org.franca.core.franca.FTypedElement
 import org.franca.core.franca.FTypeRef
 import org.franca.core.franca.FArgument
-import org.eclipse.emf.common.util.EList
 
 class XGenerator {
+
+	enum Domain {Capic, SdBus, Printf}
+
+
+	static class Symbol {
+		final String name
+		final FTypeRef type
+		final boolean isRef
+		final Domain domain
+
+		new(String name, FTypeRef type, boolean isRef, Domain domain) {
+			this.name = name
+			this.type = type
+			this.isRef = isRef
+			this.domain = domain
+		}
+		override boolean equals(Object obj) {
+			if (obj.class != typeof(Symbol))
+				return false
+			val Symbol sym = obj as Symbol
+			name == sym.name && type.match(sym.type) && isRef == sym.isRef && domain == sym.domain
+		}
+		def match(FTypeRef it, FTypeRef obj) {
+			return predefined != FBasicTypeId.UNDEFINED && predefined == obj.predefined
+		}
+		override def String toString() {
+			"Symbol name=" + name + ", type=" + type.predefined.toString() +
+					", isRef=" + isRef.toString() + ", domain=" + domain.toString()
+		}
+		def byVal(Domain domain) {
+			new Symbol(this.name, this.type, false, domain)
+		}
+		def byRef(Domain domain) {
+			new Symbol(this.name, this.type, true, domain)
+		}
+	}
+
 
 	def generateClientInterfaceHeader(FInterface api) '''
 		«copyrightNotice»
@@ -40,14 +77,14 @@ class XGenerator {
 
 		«FOR m : api.methods»
 		«IF !m.fireAndForget»
-		typedef void (*«m.clientReplyTypeName»)(«api.clientTypeSignature» *instance«m.outArgs.byVal»);
+		typedef void (*«m.clientReplyTypeName»)(«api.clientTypeSignature» *instance«m.outArgs.byVal(Capic).asParam»);
 		«ENDIF»
 		«ENDFOR»
 
 		«FOR m : api.methods»
-		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArgs.byVal»«m.outArgs.byRef»);
+		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArgs.byVal(Capic).asParam»«m.outArgs.byRef(Capic).asParam»);
 		«IF !m.fireAndForget»
-		int cc_«api.name»_«m.name»_async(«api.clientTypeSignature» *instance«m.inArgs.byVal», «m.clientReplyTypeName» callback);
+		int cc_«api.name»_«m.name»_async(«api.clientTypeSignature» *instance«m.inArgs.byVal(Capic).asParam», «m.clientReplyTypeName» callback);
 		«ENDIF»
 
 		«ENDFOR»
@@ -92,7 +129,7 @@ class XGenerator {
 		«FOR m : api.methods»
 		«IF m.isFireAndForget»
 
-		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance)
+		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArgs.byVal(Capic).asParam»)
 		{
 			int result = 0;
 			struct cc_instance *i;
@@ -111,7 +148,7 @@ class XGenerator {
 				goto fail;
 			}
 			«IF !m.inArgs.empty»
-			result = sd_bus_message_append(message, «m.inSignaturesAsDBus»«m.inArgumentsAsDBusWrite»);
+			result = sd_bus_message_append(message, «m.inArgs.byVal(Capic).asSdBusSig»«m.inArgs.byVal(Capic).asRVal(SdBus)»);
 			if (result < 0) {
 				CC_LOG_ERROR("unable to append message method arguments: %s\n", strerror(-result));
 				goto fail;
@@ -136,21 +173,16 @@ class XGenerator {
 		}
 		«ELSE»
 
-		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArgs.byVal»«m.outArgs.byRef»)
+		int cc_«api.name»_«m.name»(«api.clientTypeSignature» *instance«m.inArgs.byVal(Capic).asParam»«m.outArgs.byRef(Capic).asParam»)
 		{
 			int result = 0;
 			struct cc_instance *i;
 			sd_bus_message *message = NULL;
 			sd_bus_message *reply = NULL;
 			sd_bus_error error = SD_BUS_ERROR_NULL;
-			«FOR a : m.outArgs»
-			«IF a.type.predefined == FBasicTypeId::BOOLEAN»
-			int «a.name»_int;
-			«ELSEIF a.type.predefined == FBasicTypeId::INT8»
-			uint8_t «a.name»_uint8_t;
-			«ELSEIF a.type.predefined == FBasicTypeId::FLOAT»
-			double «a.name»_double;
-			«ENDIF»
+			«val outArgsDiff = m.outArgs.byVal(SdBus).diffBySig(m.outArgs.byVal(Capic))»
+			«FOR s : outArgsDiff»
+			«s.byVal(SdBus).asSig»«s.byVal(SdBus).asLVal(SdBus)»;
 			«ENDFOR»
 
 			CC_LOG_DEBUG("invoked cc_«api.name»_«m.name»()\n");
@@ -166,26 +198,20 @@ class XGenerator {
 			assert(!instance->«m.name»_reply_callback);
 
 			result = sd_bus_call_method(
-				i->backend->bus, i->service, i->path, i->interface, "«m.name»", &error, &reply, «m.inSignaturesAsDBus»«m.inArgumentsAsDBusWrite»);
+				i->backend->bus, i->service, i->path, i->interface, "«m.name»", &error, &reply, «m.inArgs.byVal(Capic).asSdBusSig»«m.inArgs.byVal(Capic).asRVal(SdBus)»);
 			if (result < 0) {
 				CC_LOG_ERROR("unable to call method: %s\n", strerror(-result));
 				goto fail;
 			}
-			result = sd_bus_message_read(reply, «m.outSignaturesAsDBus»«m.outArgumentsAsDBus»);
+			result = sd_bus_message_read(reply, «m.outArgs.byRef(Capic).asSdBusSig»«m.outArgs.byRef(Capic).asRef(SdBus)»);
 			if (result < 0) {
 				CC_LOG_ERROR("unable to get reply value: %s\n", strerror(-result));
 				goto fail;
 			}
-			«FOR a : m.outArgs»
-			«IF a.type.predefined == FBasicTypeId::BOOLEAN»
-			*«a.name» = !!«a.name»_int;
-			«ELSEIF a.type.predefined == FBasicTypeId::INT8»
-			*«a.name» = (int8_t) «a.name»_uint8_t;
-			«ELSEIF a.type.predefined == FBasicTypeId::FLOAT»
-			*«a.name» = (float) «a.name»_double;
-			«ENDIF»
+			«FOR s : outArgsDiff»
+			«s.byRef(Capic).asLVal(Capic)» = «s.byVal(SdBus).asRVal(Capic)»;
 			«ENDFOR»
-			CC_LOG_DEBUG("returning «m.outArgumentsAsDBusLogFormat»\n"«m.outArgumentsAsDBusLog»);
+			CC_LOG_DEBUG("returning «m.outArgs.byRef(Capic).asPrintfFormat»\n"«m.outArgs.byRef(Capic).asRVal(Printf)»);
 
 		fail:
 			sd_bus_error_free(&error);
@@ -200,17 +226,7 @@ class XGenerator {
 			int result = 0;
 			sd_bus *bus;
 			«api.clientTypeSignature» *ii = («api.clientTypeSignature» *) userdata;
-			«FOR a : m.outArgs»
-			«IF a.type.predefined == FBasicTypeId::BOOLEAN»
-			int «a.name»_int;
-			«ELSEIF a.type.predefined == FBasicTypeId::INT8»
-			uint8_t «a.name»_uint8_t;
-			«ELSEIF a.type.predefined == FBasicTypeId::FLOAT»
-			double «a.name»_double;
-			«ELSE»
-			«a.type.typeSignature»«a.name»;
-			«ENDIF»
-			«ENDFOR»
+			«m.outArgs.byVal(SdBus).asDecl»
 
 			CC_LOG_DEBUG("invoked «m.clientReplyThunkName»()\n");
 			assert(message);
@@ -224,14 +240,14 @@ class XGenerator {
 				CC_LOG_ERROR("failed to receive response: %s\n", strerror(result));
 				goto finish;
 			}
-			result = sd_bus_message_read(message, «m.outSignaturesAsDBus»«m.outArgumentsAsDBusThunk»);
+			result = sd_bus_message_read(message, «m.outArgs.byVal(SdBus).asSdBusSig»«m.outArgs.byVal(SdBus).asRef(SdBus)»);
 			if (result < 0) {
 				CC_LOG_ERROR("unable to get reply value: %s\n", strerror(-result));
 				goto finish;
 			}
 			CC_LOG_DEBUG("invoking callback in «m.clientReplyThunkName»()\n");
-			CC_LOG_DEBUG("with «m.outArgumentsAsDBusLogFormat»\n"«m.outArgumentsAsDBusReply»);
-			ii->«m.name»_reply_callback(ii«m.outArgumentsAsDBusReply»);
+			CC_LOG_DEBUG("with «m.outArgs.byVal(SdBus).asPrintfFormat»\n"«m.outArgs.byVal(SdBus).asRVal(Printf)»);
+			ii->«m.name»_reply_callback(ii«m.outArgs.byVal(SdBus).asRVal(Capic)»);
 			result = 1;
 
 		finish:
@@ -241,7 +257,7 @@ class XGenerator {
 			return result;
 		}
 
-		int cc_«api.name»_«m.name»_async(«api.clientTypeSignature» *instance«m.inArgs.byVal», «m.clientReplyTypeName» callback)
+		int cc_«api.name»_«m.name»_async(«api.clientTypeSignature» *instance«m.inArgs.byVal(Capic).asParam», «m.clientReplyTypeName» callback)
 		{
 			int result = 0;
 			struct cc_instance *i;
@@ -266,7 +282,7 @@ class XGenerator {
 				CC_LOG_ERROR("unable to create message: %s\n", strerror(-result));
 				goto fail;
 			}
-			result = sd_bus_message_append(message, «m.inSignaturesAsDBus»«m.inArgumentsAsDBusWrite»);
+			result = sd_bus_message_append(message, «m.inArgs.byVal(Capic).asSdBusSig»«m.inArgs.byVal(Capic).asRVal(SdBus)»);
 			if (result < 0) {
 				CC_LOG_ERROR("unable to append message method arguments: %s\n", strerror(-result));
 				goto fail;
@@ -360,7 +376,7 @@ class XGenerator {
 		«api.serverTypeSignature»;
 
 		«FOR m : api.methods»
-		typedef int (*cc_«api.name»_«m.name»_t)(«api.serverTypeSignature» *instance«m.inArgs.byVal»«m.outArgs.byRef»);
+		typedef int (*cc_«api.name»_«m.name»_t)(«api.serverTypeSignature» *instance«m.inArgs.byVal(Capic).asParam»«m.outArgs.byRef(Capic).asParam»);
 		«ENDFOR»
 
 		«api.serverImplTypeSignature» {
@@ -409,27 +425,15 @@ class XGenerator {
 		{
 			int result = 0;
 			«api.serverTypeSignature» *ii = («api.serverTypeSignature» *) userdata;
-			«FOR a : m.inArgs»
-			«IF a.type.predefined == FBasicTypeId::BOOLEAN»
-			int «a.name»_int;
-			«ELSEIF a.type.predefined == FBasicTypeId::INT8»
-			uint8_t «a.name»_uint8_t;
-			«ELSEIF a.type.predefined == FBasicTypeId::FLOAT»
-			double «a.name»_double;
-			«ELSE»
-			«a.type.typeSignature»«a.name»;
-			«ENDIF»
-			«ENDFOR»
-			«FOR a : m.outArgs»
-			«a.type.typeSignature»«a.name»;
-			«ENDFOR»
+			«m.inArgs.byVal(SdBus).asDecl»
+			«m.outArgs.byVal(Capic).asDecl»
 
 			CC_LOG_DEBUG("invoked «m.serverThunkName»()\n");
 			assert(m);
 			assert(ii && ii->impl);
 			CC_LOG_DEBUG("with path='%s'\n", sd_bus_message_get_path(m));
 
-			result = sd_bus_message_read(m, «m.inSignaturesAsDBus»«m.inArgumentsAsDBusThunk»);
+			result = sd_bus_message_read(m, «m.inArgs.byVal(SdBus).asSdBusSig»«m.inArgs.byVal(SdBus).asRef(SdBus)»);
 			if (result < 0) {
 				CC_LOG_ERROR("unable to read method parameters: %s\n", strerror(-result));
 				return result;
@@ -440,7 +444,7 @@ class XGenerator {
 				sd_bus_reply_method_error(m, error);
 				return -ENOTSUP;
 			}
-			result = ii->impl->«m.name»(ii«m.inArgumentsAsDBusReply»«m.outArgumentsAsDBusImpl»);
+			result = ii->impl->«m.name»(ii«m.inArgs.byVal(SdBus).asRVal(Capic)»«m.outArgs.byVal(Capic).asRef(Capic)»);
 			if (result < 0) {
 				CC_LOG_ERROR("failed to execute method: %s\n", strerror(-result));
 				sd_bus_error_setf(error, SD_BUS_ERROR_FAILED, "method implementation failed with error=%d", result);
@@ -448,7 +452,7 @@ class XGenerator {
 				return result;
 			}
 			«IF !m.fireAndForget»
-			result = sd_bus_reply_method_return(m, «m.outSignaturesAsDBus»«m.outArgumentsAsDBusWrite»);
+			result = sd_bus_reply_method_return(m, «m.outArgs.byVal(Capic).asSdBusSig»«m.outArgs.byVal(Capic).asRVal(SdBus)»);
 			if (result < 0) {
 				CC_LOG_ERROR("unable to send method reply: %s\n", strerror(-result));
 				return result;
@@ -463,7 +467,7 @@ class XGenerator {
 		static const sd_bus_vtable vtable_«api.name»[] = {
 			SD_BUS_VTABLE_START(0),
 			«FOR m : api.methods»
-			SD_BUS_METHOD("«m.name»", «m.inSignaturesAsDBus», «m.outSignaturesAsDBus», &«m.serverThunkName», «IF m.fireAndForget»SD_BUS_VTABLE_METHOD_NO_REPLY«ELSE»0«ENDIF»),
+			SD_BUS_METHOD("«m.name»", «m.inArgs.byVal(SdBus).asSdBusSig», «m.outArgs.byVal(SdBus).asSdBusSig», &«m.serverThunkName», «IF m.fireAndForget»SD_BUS_VTABLE_METHOD_NO_REPLY«ELSE»0«ENDIF»),
 			«ENDFOR»
 			SD_BUS_VTABLE_END
 		};
@@ -572,25 +576,95 @@ class XGenerator {
 		cc_«it.apiName»_«it.name»_thunk'''
 
 
-	def byVal(EList<FArgument> it) '''
-		«FOR a : it», «a.type.byVal»«a.name»«ENDFOR»'''
-
-
-	def byRef(EList<FArgument> it) '''
-		«FOR a : it», «a.type.byRef»«a.name»«ENDFOR»'''
-
-
-	def byVal(FTypeRef it) {
-		typeSignature
+	def apiName(FMethod it) {
+		var api = it.eContainer()
+		api.eGet(api.eClass().getEStructuralFeature("name"))
 	}
 
 
-	def byRef(FTypeRef it) {
-		typeSignature + "*"
+	static def inArgs(FMethod it) {
+		getInArgs()
 	}
 
 
-	def typeSignature(FTypeRef it) {
+	static def outArgs(FMethod it) {
+		getOutArgs()
+	}
+
+
+	static def byVal(Iterable<FArgument> it, Domain domain) {
+		map[a | byVal(a, domain)]
+	}
+
+
+	static def byRef(Iterable<FArgument> it, Domain domain) {
+		map[a | byRef(a, domain)]
+	}
+
+
+	static def asParam(Iterable<Symbol> it) '''
+		«FOR s : it», «s.asParam»«ENDFOR»'''
+
+
+	static def asDecl(Iterable<Symbol> it) '''
+		«FOR s : it»«s.asDecl»;
+		«ENDFOR»'''
+
+
+	static def asAssign(Iterable<Symbol> it, Iterable<Symbol> ss) '''
+		«if (it.size != ss.size)
+			throw new IllegalArgumentException("Sequences must have the same size")»
+		«val iter = ss.iterator()»
+		«val pairs = map[ s | s -> iter.next ]»
+		«FOR p : pairs»«p.key.asAssign(p.value)»;
+		«ENDFOR»'''
+
+
+	static def asRVal(Iterable<Symbol> it, Domain domain) '''
+		«FOR s : it», «s.asRVal(domain)»«ENDFOR»'''
+
+
+	static def asRef(Iterable<Symbol> it, Domain domain) '''
+		«FOR s : it», «s.asRef(domain)»«ENDFOR»'''
+
+
+	static def Iterable<Symbol> diffBySig(Iterable<Symbol> it, Iterable<Symbol> ss) {
+		if (it.size != ss.size)
+			throw new IllegalArgumentException("Sequences must have the same size")
+		var result = newArrayList()
+		for (var n = 0; n < it.size; n++)
+			if (it.get(n).asSig != ss.get(n).asSig)
+				result.add(it.get(n))
+		return result
+	}
+
+
+	static def byVal(FArgument it, Domain domain) {
+		new Symbol(name, type, false, domain)
+	}
+
+
+	static def byRef(FArgument it, Domain domain) {
+		new Symbol(name, type, true, domain)
+	}
+
+
+	static def asParam(Symbol it) {
+		asSig + name
+	}
+
+
+	static def asDecl(Symbol it) {
+		asSig + asLVal(domain)
+	}
+
+
+	static def asAssign(Symbol it, Symbol sym) {
+		asLVal(domain) + " = " + sym.asRVal(domain)
+	}
+
+
+	static def asCapicSig(FTypeRef it) {
 		if (predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
 		switch (predefined) {
@@ -610,195 +684,189 @@ class XGenerator {
 	}
 
 
-	def apiName(FMethod it) {
-		var api = it.eContainer()
-		api.eGet(api.eClass().getEStructuralFeature("name"))
+	static def asSig(Symbol it) {
+		if (it.domain == Capic && !it.isRef)
+			return type.asCapicSig
+		if (it.domain == Capic && it.isRef)
+			return type.asCapicSig + "*"
+		if (it.domain == SdBus && !it.isRef) {
+			if (type.predefined == FBasicTypeId.UNDEFINED)
+				throw new UnsupportedOperationException("Derived and Integer types are not supported")
+			return switch (type.predefined) {
+				case FBasicTypeId::BOOLEAN:     "int "
+				case FBasicTypeId::FLOAT:       "double "
+				case FBasicTypeId::INT8:        "uint8_t "
+				case FBasicTypeId::INT16,
+				case FBasicTypeId::INT32,
+				case FBasicTypeId::INT64,
+				case FBasicTypeId::UINT8,
+				case FBasicTypeId::UINT16,
+				case FBasicTypeId::UINT32,
+				case FBasicTypeId::UINT64,
+				case FBasicTypeId::DOUBLE:      type.asCapicSig
+				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+			}
+		}
+		throw new UnsupportedOperationException("FIXME: Unsupported symbol transformation")
 	}
 
 
-	def inArgs(FMethod it) {
-		getInArgs()
+	static def asRVal(Symbol it, Domain domain) {
+		if (it.domain == Capic && domain == Capic && !it.isRef)
+			return name
+		if (it.domain == Capic && domain == SdBus && !it.isRef) {
+			if (type.predefined == FBasicTypeId.UNDEFINED)
+				throw new UnsupportedOperationException("Derived and Integer types are not supported")
+			return switch (type.predefined) {
+				case FBasicTypeId::BOOLEAN:     "(int) " + name
+				case FBasicTypeId::FLOAT:       "(double) " + name
+				case FBasicTypeId::INT8:        "(uint8_t) " + name
+				case FBasicTypeId::INT16,
+				case FBasicTypeId::INT32,
+				case FBasicTypeId::INT64,
+				case FBasicTypeId::UINT8,
+				case FBasicTypeId::UINT16,
+				case FBasicTypeId::UINT32,
+				case FBasicTypeId::UINT64,
+				case FBasicTypeId::DOUBLE:      name
+				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+			}
+		}
+		if (it.domain == Capic && domain == Printf && it.isRef) {
+			if (type.predefined == FBasicTypeId.UNDEFINED)
+				throw new UnsupportedOperationException("Derived and Integer types are not supported")
+			return switch (type.predefined) {
+				case FBasicTypeId::BOOLEAN:     "(int) *" + name
+				case FBasicTypeId::FLOAT,
+				case FBasicTypeId::INT8,
+				case FBasicTypeId::INT16,
+				case FBasicTypeId::INT32,
+				case FBasicTypeId::INT64,
+				case FBasicTypeId::UINT8,
+				case FBasicTypeId::UINT16,
+				case FBasicTypeId::UINT32,
+				case FBasicTypeId::UINT64,
+				case FBasicTypeId::DOUBLE:      "*" + name
+				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+			}
+		}
+		if (it.domain == SdBus && (domain == Printf || domain == Capic) && !it.isRef) {
+			if (type.predefined == FBasicTypeId.UNDEFINED)
+				throw new UnsupportedOperationException("Derived and Integer types are not supported")
+			return switch (type.predefined) {
+				case FBasicTypeId::BOOLEAN:     "!!" + name + "_int"
+				case FBasicTypeId::FLOAT:       "(float) " + name + "_double"
+				case FBasicTypeId::INT8:        "(int8_t) " + name + "_uint8_t"
+				case FBasicTypeId::INT16,
+				case FBasicTypeId::INT32,
+				case FBasicTypeId::INT64,
+				case FBasicTypeId::UINT8,
+				case FBasicTypeId::UINT16,
+				case FBasicTypeId::UINT32,
+				case FBasicTypeId::UINT64,
+				case FBasicTypeId::DOUBLE:      name
+				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+			}
+		}
+		throw new UnsupportedOperationException("FIXME: Unsupported symbol transformation")
 	}
 
 
-	def outArgs(FMethod it) {
-		getOutArgs()
+	static def asLVal(Symbol it, Domain domain) {
+		if (it.domain == Capic && domain == Capic && !it.isRef)
+			return name
+		if (it.domain == Capic && domain == Capic && it.isRef)
+			return "*" + name
+		if (it.domain == SdBus && domain == SdBus && !it.isRef) {
+			if (type.predefined == FBasicTypeId.UNDEFINED)
+				throw new UnsupportedOperationException("Derived and Integer types are not supported")
+			return switch (type.predefined) {
+				case FBasicTypeId::BOOLEAN:     name + "_int"
+				case FBasicTypeId::FLOAT:       name + "_double"
+				case FBasicTypeId::INT8:        name + "_uint8_t"
+				case FBasicTypeId::INT16,
+				case FBasicTypeId::INT32,
+				case FBasicTypeId::INT64,
+				case FBasicTypeId::UINT8,
+				case FBasicTypeId::UINT16,
+				case FBasicTypeId::UINT32,
+				case FBasicTypeId::UINT64,
+				case FBasicTypeId::DOUBLE:      name
+				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+			}
+		}
+		throw new UnsupportedOperationException("FIXME: Unsupported symbol transformation")
 	}
 
 
-	def inArgumentsAsDBusWrite(FMethod it) '''
-		«FOR a : inArgs BEFORE ', ' SEPARATOR ', '»«a.argumentAsDBusWrite»«ENDFOR»'''
+	static def asRef(Symbol it, Domain domain) {
+		if (it.domain == Capic && domain == Capic && !it.isRef)
+			return "&" + name
+		if (it.domain == Capic && domain == SdBus && it.isRef) {
+			return switch (type.predefined) {
+				case FBasicTypeId::BOOLEAN:     "&" + name + "_int"
+				case FBasicTypeId::FLOAT:       "&" + name + "_double"
+				case FBasicTypeId::INT8:        "&" + name + "_uint8_t"
+				case FBasicTypeId::INT16,
+				case FBasicTypeId::INT32,
+				case FBasicTypeId::INT64,
+				case FBasicTypeId::UINT8,
+				case FBasicTypeId::UINT16,
+				case FBasicTypeId::UINT32,
+				case FBasicTypeId::UINT64,
+				case FBasicTypeId::DOUBLE:      name
+				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+			}
+		}
+		if (it.domain == SdBus && domain == SdBus && !it.isRef) {
+			return switch (type.predefined) {
+				case FBasicTypeId::BOOLEAN:     "&" + name + "_int"
+				case FBasicTypeId::FLOAT:       "&" + name + "_double"
+				case FBasicTypeId::INT8:        "&" + name + "_uint8_t"
+				case FBasicTypeId::INT16,
+				case FBasicTypeId::INT32,
+				case FBasicTypeId::INT64,
+				case FBasicTypeId::UINT8,
+				case FBasicTypeId::UINT16,
+				case FBasicTypeId::UINT32,
+				case FBasicTypeId::UINT64,
+				case FBasicTypeId::DOUBLE:      "&" + name
+				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+			}
+		}
+		throw new UnsupportedOperationException("FIXME: Unsupported symbol transformation")
+	}
 
 
-	def outArgumentsAsDBusWrite(FMethod it) '''
-		«FOR a : outArgs BEFORE ', ' SEPARATOR ', '»«a.argumentAsDBusWrite»«ENDFOR»'''
+	static def asPrintfFormat(Iterable<Symbol> it) '''
+		«IF empty»void«ELSE»«FOR s : it SEPARATOR ', '»«s.name»=%«s.type.asPrintfSig»«ENDFOR»«ENDIF»'''
 
 
-	def outArgumentsAsDBus(FMethod it) '''
-		«FOR a : outArgs BEFORE ', ' SEPARATOR ', '»«a.outArgumentAsDBus»«ENDFOR»'''
-
-
-	def inArgumentsAsDBusThunk(FMethod it) '''
-		«FOR a : inArgs BEFORE ', ' SEPARATOR ', '»«a.argumentAsDBusThunk»«ENDFOR»'''
-
-
-	def outArgumentsAsDBusThunk(FMethod it) '''
-		«FOR a : outArgs BEFORE ', ' SEPARATOR ', '»«a.argumentAsDBusThunk»«ENDFOR»'''
-
-
-	def inArgumentsAsDBusReply(FMethod it) '''
-		«FOR a : inArgs BEFORE ', ' SEPARATOR ', '»«a.argumentAsDBusReply»«ENDFOR»'''
-
-
-	def outArgumentsAsDBusReply(FMethod it) '''
-		«FOR a : outArgs BEFORE ', ' SEPARATOR ', '»«a.argumentAsDBusReply»«ENDFOR»'''
-
-
-	def outArgumentsAsDBusImpl(FMethod it) '''
-		«FOR a : outArgs BEFORE ', ' SEPARATOR ', '»«a.outArgumentAsDBusImpl»«ENDFOR»'''
-
-
-	def outArgumentsAsDBusLog(FMethod it) '''
-		«FOR a : outArgs BEFORE ', ' SEPARATOR ', '»«a.outArgumentAsDBusLog»«ENDFOR»'''
-
-
-	def outArgumentsAsDBusLogFormat(FMethod it) '''
-		«IF outArgs.empty»void«ELSE»«FOR a : outArgs SEPARATOR ', '»«a.outArgumentAsDBusLogFormat»«ENDFOR»«ENDIF»'''
-
-
-	def argumentAsDBusWrite(FTypedElement it) {
-		if (type.predefined == FBasicTypeId.UNDEFINED)
+	static def asPrintfSig(FTypeRef it) {
+		if (predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
-		switch (type.predefined) {
-			case FBasicTypeId::BOOLEAN:     "(int) " + name
-			case FBasicTypeId::FLOAT:       "(double) " + name
-			case FBasicTypeId::INT8:        "(uint8_t) " + name
-			case FBasicTypeId::INT16:       name
-			case FBasicTypeId::INT32:       name
-			case FBasicTypeId::INT64:       name
-			case FBasicTypeId::UINT8:       name
-			case FBasicTypeId::UINT16:      name
-			case FBasicTypeId::UINT32:      name
-			case FBasicTypeId::UINT64:      name
-			case FBasicTypeId::DOUBLE:      name
-			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+		switch (predefined) {
+			case FBasicTypeId::BOOLEAN:     "d"
+			case FBasicTypeId::FLOAT:       "g"
+			case FBasicTypeId::INT8:        "d"
+			case FBasicTypeId::INT16:       "d"
+			case FBasicTypeId::INT32:       "d"
+			case FBasicTypeId::INT64:       "d"
+			case FBasicTypeId::UINT8:       "u"
+			case FBasicTypeId::UINT16:      "u"
+			case FBasicTypeId::UINT32:      "u"
+			case FBasicTypeId::UINT64:      "u"
+			case FBasicTypeId::DOUBLE:      "g"
+			default: throw new IllegalArgumentException("Unsupported basic type " + predefined.toString)
 		}
 	}
 
 
-	def outArgumentAsDBus(FTypedElement it) {
-		if (type.predefined == FBasicTypeId.UNDEFINED)
-			throw new UnsupportedOperationException("Derived and Integer types are not supported")
-		switch (type.predefined) {
-			case FBasicTypeId::BOOLEAN:     "&" + name + "_int"
-			case FBasicTypeId::FLOAT:       "&" + name + "_double"
-			case FBasicTypeId::INT8:        "&" + name + "_uint8_t"
-			case FBasicTypeId::INT16:       name
-			case FBasicTypeId::INT32:       name
-			case FBasicTypeId::INT64:       name
-			case FBasicTypeId::UINT8:       name
-			case FBasicTypeId::UINT16:      name
-			case FBasicTypeId::UINT32:      name
-			case FBasicTypeId::UINT64:      name
-			case FBasicTypeId::DOUBLE:      name
-			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-		}
-	}
+	static def asSdBusSig(Iterable<Symbol> it) '''
+		"«FOR s : it»«s.type.asSdBusSig»«ENDFOR»"'''
 
 
-	def argumentAsDBusThunk(FTypedElement it) {
-		if (type.predefined == FBasicTypeId.UNDEFINED)
-			throw new UnsupportedOperationException("Derived and Integer types are not supported")
-		switch (type.predefined) {
-			case FBasicTypeId::BOOLEAN:     "&" + name + "_int"
-			case FBasicTypeId::FLOAT:       "&" + name + "_double"
-			case FBasicTypeId::INT8:        "&" + name + "_uint8_t"
-			case FBasicTypeId::INT16:       "&" + name
-			case FBasicTypeId::INT32:       "&" + name
-			case FBasicTypeId::INT64:       "&" + name
-			case FBasicTypeId::UINT8:       "&" + name
-			case FBasicTypeId::UINT16:      "&" + name
-			case FBasicTypeId::UINT32:      "&" + name
-			case FBasicTypeId::UINT64:      "&" + name
-			case FBasicTypeId::DOUBLE:      "&" + name
-			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-		}
-	}
-
-
-	def argumentAsDBusReply(FTypedElement it) {
-		if (type.predefined == FBasicTypeId.UNDEFINED)
-			throw new UnsupportedOperationException("Derived and Integer types are not supported")
-		switch (type.predefined) {
-			case FBasicTypeId::BOOLEAN:     "!!" + name + "_int"
-			case FBasicTypeId::FLOAT:       "(float) " + name + "_double"
-			case FBasicTypeId::INT8:        "(int8_t) " + name + "_uint8_t"
-			case FBasicTypeId::INT16:       name
-			case FBasicTypeId::INT32:       name
-			case FBasicTypeId::INT64:       name
-			case FBasicTypeId::UINT8:       name
-			case FBasicTypeId::UINT16:      name
-			case FBasicTypeId::UINT32:      name
-			case FBasicTypeId::UINT64:      name
-			case FBasicTypeId::DOUBLE:      name
-			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-		}
-	}
-
-
-	def outArgumentAsDBusImpl(FTypedElement it) '''
-		&«name»'''
-
-
-	def outArgumentAsDBusLog(FTypedElement it) {
-		if (type.predefined == FBasicTypeId.UNDEFINED)
-			throw new UnsupportedOperationException("Derived and Integer types are not supported")
-		switch (type.predefined) {
-			case FBasicTypeId::BOOLEAN:     "(int) *" + name
-			case FBasicTypeId::FLOAT:       "*" + name
-			case FBasicTypeId::INT8:        "*" + name
-			case FBasicTypeId::INT16:       "*" + name
-			case FBasicTypeId::INT32:       "*" + name
-			case FBasicTypeId::INT64:       "*" + name
-			case FBasicTypeId::UINT8:       "*" + name
-			case FBasicTypeId::UINT16:      "*" + name
-			case FBasicTypeId::UINT32:      "*" + name
-			case FBasicTypeId::UINT64:      "*" + name
-			case FBasicTypeId::DOUBLE:      "*" + name
-			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-		}
-	}
-
-
-	def outArgumentAsDBusLogFormat(FTypedElement it) {
-		if (type.predefined == FBasicTypeId.UNDEFINED)
-			throw new UnsupportedOperationException("Derived and Integer types are not supported")
-		switch (type.predefined) {
-			case FBasicTypeId::BOOLEAN:     name + "=%d"
-			case FBasicTypeId::FLOAT:       name + "=%g"
-			case FBasicTypeId::INT8:        name + "=%d"
-			case FBasicTypeId::INT16:       name + "=%d"
-			case FBasicTypeId::INT32:       name + "=%d"
-			case FBasicTypeId::INT64:       name + "=%d"
-			case FBasicTypeId::UINT8:       name + "=%u"
-			case FBasicTypeId::UINT16:      name + "=%u"
-			case FBasicTypeId::UINT32:      name + "=%u"
-			case FBasicTypeId::UINT64:      name + "=%u"
-			case FBasicTypeId::DOUBLE:      name + "=%g"
-			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-		}
-	}
-
-
-	def inSignaturesAsDBus(FMethod it) '''
-		"«FOR a : inArgs»«a.type.typeSignatureAsDBus»«ENDFOR»"'''
-
-
-	def outSignaturesAsDBus(FMethod it) '''
-		"«FOR a : outArgs»«a.type.typeSignatureAsDBus»«ENDFOR»"'''
-
-
-	def typeSignatureAsDBus(FTypeRef it) {
+	static def asSdBusSig(FTypeRef it) {
 		if (predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
 		switch (predefined) {
