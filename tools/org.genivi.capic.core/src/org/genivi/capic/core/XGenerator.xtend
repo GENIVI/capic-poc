@@ -591,23 +591,21 @@ class XGenerator {
 
 
 	def typeSignature(FTypeRef it) {
-		if (predefined != null) {
-			switch (predefined) {
-				case FBasicTypeId::BOOLEAN:     "bool "
-				case FBasicTypeId::INT8:        "int8_t "
-				case FBasicTypeId::INT16:       "int16_t "
-				case FBasicTypeId::INT32:       "int32_t "
-				case FBasicTypeId::INT64:       "int64_t "
-				case FBasicTypeId::UINT8:       "uint8_t "
-				case FBasicTypeId::UINT16:      "uint16_t "
-				case FBasicTypeId::UINT32:      "uint32_t "
-				case FBasicTypeId::UINT64:      "uint64_t "
-				case FBasicTypeId::FLOAT:       "float "
-				case FBasicTypeId::DOUBLE:      "double "
-				default: throw new IllegalArgumentException("Unsupported basic type " + predefined.toString)
-			}
-		} else {
+		if (predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
+		switch (predefined) {
+			case FBasicTypeId::BOOLEAN:     "bool "
+			case FBasicTypeId::INT8:        "int8_t "
+			case FBasicTypeId::INT16:       "int16_t "
+			case FBasicTypeId::INT32:       "int32_t "
+			case FBasicTypeId::INT64:       "int64_t "
+			case FBasicTypeId::UINT8:       "uint8_t "
+			case FBasicTypeId::UINT16:      "uint16_t "
+			case FBasicTypeId::UINT32:      "uint32_t "
+			case FBasicTypeId::UINT64:      "uint64_t "
+			case FBasicTypeId::FLOAT:       "float "
+			case FBasicTypeId::DOUBLE:      "double "
+			default: throw new IllegalArgumentException("Unsupported basic type " + predefined.toString)
 		}
 	}
 
@@ -669,89 +667,81 @@ class XGenerator {
 
 
 	def argumentAsDBusWrite(FTypedElement it) {
-		if (type.predefined != null) {
-			switch (type.predefined) {
-				case FBasicTypeId::BOOLEAN:     "(int) " + name
-				case FBasicTypeId::FLOAT:       "(double) " + name
-				case FBasicTypeId::INT8:        "(uint8_t) " + name
-				case FBasicTypeId::INT16:       name
-				case FBasicTypeId::INT32:       name
-				case FBasicTypeId::INT64:       name
-				case FBasicTypeId::UINT8:       name
-				case FBasicTypeId::UINT16:      name
-				case FBasicTypeId::UINT32:      name
-				case FBasicTypeId::UINT64:      name
-				case FBasicTypeId::DOUBLE:      name
-				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-			}
-		} else {
+		if (type.predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
+		switch (type.predefined) {
+			case FBasicTypeId::BOOLEAN:     "(int) " + name
+			case FBasicTypeId::FLOAT:       "(double) " + name
+			case FBasicTypeId::INT8:        "(uint8_t) " + name
+			case FBasicTypeId::INT16:       name
+			case FBasicTypeId::INT32:       name
+			case FBasicTypeId::INT64:       name
+			case FBasicTypeId::UINT8:       name
+			case FBasicTypeId::UINT16:      name
+			case FBasicTypeId::UINT32:      name
+			case FBasicTypeId::UINT64:      name
+			case FBasicTypeId::DOUBLE:      name
+			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
 		}
 	}
 
 
 	def outArgumentAsDBus(FTypedElement it) {
-		if (type.predefined != null) {
-			switch (type.predefined) {
-				case FBasicTypeId::BOOLEAN:     "&" + name + "_int"
-				case FBasicTypeId::FLOAT:       "&" + name + "_double"
-				case FBasicTypeId::INT8:        "&" + name + "_uint8_t"
-				case FBasicTypeId::INT16:       name
-				case FBasicTypeId::INT32:       name
-				case FBasicTypeId::INT64:       name
-				case FBasicTypeId::UINT8:       name
-				case FBasicTypeId::UINT16:      name
-				case FBasicTypeId::UINT32:      name
-				case FBasicTypeId::UINT64:      name
-				case FBasicTypeId::DOUBLE:      name
-				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-			}
-		} else {
+		if (type.predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
+		switch (type.predefined) {
+			case FBasicTypeId::BOOLEAN:     "&" + name + "_int"
+			case FBasicTypeId::FLOAT:       "&" + name + "_double"
+			case FBasicTypeId::INT8:        "&" + name + "_uint8_t"
+			case FBasicTypeId::INT16:       name
+			case FBasicTypeId::INT32:       name
+			case FBasicTypeId::INT64:       name
+			case FBasicTypeId::UINT8:       name
+			case FBasicTypeId::UINT16:      name
+			case FBasicTypeId::UINT32:      name
+			case FBasicTypeId::UINT64:      name
+			case FBasicTypeId::DOUBLE:      name
+			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
 		}
 	}
 
 
 	def argumentAsDBusThunk(FTypedElement it) {
-		if (type.predefined != null) {
-			switch (type.predefined) {
-				case FBasicTypeId::BOOLEAN:     "&" + name + "_int"
-				case FBasicTypeId::FLOAT:       "&" + name + "_double"
-				case FBasicTypeId::INT8:        "&" + name + "_uint8_t"
-				case FBasicTypeId::INT16:       "&" + name
-				case FBasicTypeId::INT32:       "&" + name
-				case FBasicTypeId::INT64:       "&" + name
-				case FBasicTypeId::UINT8:       "&" + name
-				case FBasicTypeId::UINT16:      "&" + name
-				case FBasicTypeId::UINT32:      "&" + name
-				case FBasicTypeId::UINT64:      "&" + name
-				case FBasicTypeId::DOUBLE:      "&" + name
-				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-			}
-		} else {
+		if (type.predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
+		switch (type.predefined) {
+			case FBasicTypeId::BOOLEAN:     "&" + name + "_int"
+			case FBasicTypeId::FLOAT:       "&" + name + "_double"
+			case FBasicTypeId::INT8:        "&" + name + "_uint8_t"
+			case FBasicTypeId::INT16:       "&" + name
+			case FBasicTypeId::INT32:       "&" + name
+			case FBasicTypeId::INT64:       "&" + name
+			case FBasicTypeId::UINT8:       "&" + name
+			case FBasicTypeId::UINT16:      "&" + name
+			case FBasicTypeId::UINT32:      "&" + name
+			case FBasicTypeId::UINT64:      "&" + name
+			case FBasicTypeId::DOUBLE:      "&" + name
+			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
 		}
 	}
 
 
 	def argumentAsDBusReply(FTypedElement it) {
-		if (type.predefined != null) {
-			switch (type.predefined) {
-				case FBasicTypeId::BOOLEAN:     "!!" + name + "_int"
-				case FBasicTypeId::FLOAT:       "(float) " + name + "_double"
-				case FBasicTypeId::INT8:        "(int8_t) " + name + "_uint8_t"
-				case FBasicTypeId::INT16:       name
-				case FBasicTypeId::INT32:       name
-				case FBasicTypeId::INT64:       name
-				case FBasicTypeId::UINT8:       name
-				case FBasicTypeId::UINT16:      name
-				case FBasicTypeId::UINT32:      name
-				case FBasicTypeId::UINT64:      name
-				case FBasicTypeId::DOUBLE:      name
-				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-			}
-		} else {
+		if (type.predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
+		switch (type.predefined) {
+			case FBasicTypeId::BOOLEAN:     "!!" + name + "_int"
+			case FBasicTypeId::FLOAT:       "(float) " + name + "_double"
+			case FBasicTypeId::INT8:        "(int8_t) " + name + "_uint8_t"
+			case FBasicTypeId::INT16:       name
+			case FBasicTypeId::INT32:       name
+			case FBasicTypeId::INT64:       name
+			case FBasicTypeId::UINT8:       name
+			case FBasicTypeId::UINT16:      name
+			case FBasicTypeId::UINT32:      name
+			case FBasicTypeId::UINT64:      name
+			case FBasicTypeId::DOUBLE:      name
+			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
 		}
 	}
 
@@ -761,45 +751,41 @@ class XGenerator {
 
 
 	def outArgumentAsDBusLog(FTypedElement it) {
-		if (type.predefined != null) {
-			switch (type.predefined) {
-				case FBasicTypeId::BOOLEAN:     "(int) *" + name
-				case FBasicTypeId::FLOAT:       "*" + name
-				case FBasicTypeId::INT8:        "*" + name
-				case FBasicTypeId::INT16:       "*" + name
-				case FBasicTypeId::INT32:       "*" + name
-				case FBasicTypeId::INT64:       "*" + name
-				case FBasicTypeId::UINT8:       "*" + name
-				case FBasicTypeId::UINT16:      "*" + name
-				case FBasicTypeId::UINT32:      "*" + name
-				case FBasicTypeId::UINT64:      "*" + name
-				case FBasicTypeId::DOUBLE:      "*" + name
-				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-			}
-		} else {
+		if (type.predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
+		switch (type.predefined) {
+			case FBasicTypeId::BOOLEAN:     "(int) *" + name
+			case FBasicTypeId::FLOAT:       "*" + name
+			case FBasicTypeId::INT8:        "*" + name
+			case FBasicTypeId::INT16:       "*" + name
+			case FBasicTypeId::INT32:       "*" + name
+			case FBasicTypeId::INT64:       "*" + name
+			case FBasicTypeId::UINT8:       "*" + name
+			case FBasicTypeId::UINT16:      "*" + name
+			case FBasicTypeId::UINT32:      "*" + name
+			case FBasicTypeId::UINT64:      "*" + name
+			case FBasicTypeId::DOUBLE:      "*" + name
+			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
 		}
 	}
 
 
 	def outArgumentAsDBusLogFormat(FTypedElement it) {
-		if (type.predefined != null) {
-			switch (type.predefined) {
-				case FBasicTypeId::BOOLEAN:     name + "=%d"
-				case FBasicTypeId::FLOAT:       name + "=%g"
-				case FBasicTypeId::INT8:        name + "=%d"
-				case FBasicTypeId::INT16:       name + "=%d"
-				case FBasicTypeId::INT32:       name + "=%d"
-				case FBasicTypeId::INT64:       name + "=%d"
-				case FBasicTypeId::UINT8:       name + "=%u"
-				case FBasicTypeId::UINT16:      name + "=%u"
-				case FBasicTypeId::UINT32:      name + "=%u"
-				case FBasicTypeId::UINT64:      name + "=%u"
-				case FBasicTypeId::DOUBLE:      name + "=%g"
-				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
-			}
-		} else {
+		if (type.predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
+		switch (type.predefined) {
+			case FBasicTypeId::BOOLEAN:     name + "=%d"
+			case FBasicTypeId::FLOAT:       name + "=%g"
+			case FBasicTypeId::INT8:        name + "=%d"
+			case FBasicTypeId::INT16:       name + "=%d"
+			case FBasicTypeId::INT32:       name + "=%d"
+			case FBasicTypeId::INT64:       name + "=%d"
+			case FBasicTypeId::UINT8:       name + "=%u"
+			case FBasicTypeId::UINT16:      name + "=%u"
+			case FBasicTypeId::UINT32:      name + "=%u"
+			case FBasicTypeId::UINT64:      name + "=%u"
+			case FBasicTypeId::DOUBLE:      name + "=%g"
+			default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
 		}
 	}
 
@@ -813,23 +799,21 @@ class XGenerator {
 
 
 	def typeSignatureAsDBus(FTypeRef it) {
-		if (predefined != null) {
-			switch (predefined) {
-				case FBasicTypeId::BOOLEAN:     "b"
-				case FBasicTypeId::INT8:        "y"
-				case FBasicTypeId::INT16:       "n"
-				case FBasicTypeId::INT32:       "i"
-				case FBasicTypeId::INT64:       "x"
-				case FBasicTypeId::UINT8:       "y"
-				case FBasicTypeId::UINT16:      "q"
-				case FBasicTypeId::UINT32:      "u"
-				case FBasicTypeId::UINT64:      "t"
-				case FBasicTypeId::FLOAT:       "d"
-				case FBasicTypeId::DOUBLE:      "d"
-				default: throw new IllegalArgumentException("Unsupported basic type " + predefined.toString)
-			}
-		} else {
+		if (predefined == FBasicTypeId.UNDEFINED)
 			throw new UnsupportedOperationException("Derived and Integer types are not supported")
+		switch (predefined) {
+			case FBasicTypeId::BOOLEAN:     "b"
+			case FBasicTypeId::INT8:        "y"
+			case FBasicTypeId::INT16:       "n"
+			case FBasicTypeId::INT32:       "i"
+			case FBasicTypeId::INT64:       "x"
+			case FBasicTypeId::UINT8:       "y"
+			case FBasicTypeId::UINT16:      "q"
+			case FBasicTypeId::UINT32:      "u"
+			case FBasicTypeId::UINT64:      "t"
+			case FBasicTypeId::FLOAT:       "d"
+			case FBasicTypeId::DOUBLE:      "d"
+			default: throw new IllegalArgumentException("Unsupported basic type " + predefined.toString)
 		}
 	}
 

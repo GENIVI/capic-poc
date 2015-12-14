@@ -41,6 +41,9 @@ public class XGeneratorTest {
     public void testBasicTypeSignature() {
         XGenerator xgen = new XGenerator();
         FTypeRef type = FrancaFactory.eINSTANCE.createFTypeRef();
+        assertEquals(FBasicTypeId.UNDEFINED, type.getPredefined());
+        try { xgen.typeSignature(type); fail("Expected UnsupportedOperationException"); }
+        catch (UnsupportedOperationException e) {}
         type.setPredefined(FBasicTypeId.BOOLEAN);
         assertEquals("bool ", xgen.typeSignature(type));
         type.setPredefined(FBasicTypeId.INT8);
@@ -63,6 +66,9 @@ public class XGeneratorTest {
         assertEquals("float ", xgen.typeSignature(type));
         type.setPredefined(FBasicTypeId.DOUBLE);
         assertEquals("double ", xgen.typeSignature(type));
+        type.setPredefined(FBasicTypeId.BYTE_BUFFER);
+        try { xgen.typeSignature(type); fail("Expected IllegalArgumentException"); }
+        catch (IllegalArgumentException e) {}
     }
 
     @Test
