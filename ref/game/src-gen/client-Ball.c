@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <capic/backend.h>
 #include <capic/dbus-private.h>
 #include <capic/log.h>

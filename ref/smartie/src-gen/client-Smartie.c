@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <capic/backend.h>
 #include <capic/dbus-private.h>
 #include <capic/log.h>
@@ -62,7 +63,7 @@ int cc_Smartie_ring(struct cc_client_Smartie *instance, int32_t *status)
         CC_LOG_ERROR("unable to get reply value: %s\n", strerror(-result));
         goto fail;
     }
-    CC_LOG_DEBUG("returning status=%d\n", *status);
+    CC_LOG_DEBUG("returning status=%" PRId32 "\n", *status);
 
 fail:
     sd_bus_error_free(&error);
@@ -98,7 +99,7 @@ static int cc_Smartie_ring_reply_thunk(
         goto finish;
     }
     CC_LOG_DEBUG("invoking callback in cc_Smartie_ring_reply_thunk()\n");
-    CC_LOG_DEBUG("with status=%d\n", status);
+    CC_LOG_DEBUG("with status=%" PRId32 "\n", status);
     ii->ring_reply_callback(ii, status);
     result = 1;
 
@@ -187,7 +188,7 @@ int cc_Smartie_hangup(struct cc_client_Smartie *instance, int32_t *status)
         CC_LOG_ERROR("unable to get reply value: %s\n", strerror(-result));
         goto fail;
     }
-    CC_LOG_DEBUG("returning status=%d\n", *status);
+    CC_LOG_DEBUG("returning status=%" PRId32 "\n", *status);
 
 fail:
     sd_bus_error_free(&error);
@@ -223,7 +224,7 @@ static int cc_Smartie_hangup_reply_thunk(
         goto finish;
     }
     CC_LOG_DEBUG("invoking callback in cc_Smartie_hangup_reply_thunk()\n");
-    CC_LOG_DEBUG("with status=%d\n", status);
+    CC_LOG_DEBUG("with status=%" PRId32 "\n", status);
     ii->hangup_reply_callback(ii, status);
     result = 1;
 

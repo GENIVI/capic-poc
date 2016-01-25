@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include <capic/backend.h>
 #include <capic/dbus-private.h>
 #include <capic/log.h>
@@ -62,7 +63,7 @@ int cc_Calculator_split(
         CC_LOG_ERROR("unable to get reply value: %s\n", strerror(-result));
         goto fail;
     }
-    CC_LOG_DEBUG("returning whole=%d, fraction=%d\n", *whole, *fraction);
+    CC_LOG_DEBUG("returning whole=%" PRId32 ", fraction=%" PRId32 "\n", *whole, *fraction);
 
 fail:
     sd_bus_error_free(&error);
@@ -99,7 +100,7 @@ static int cc_Calculator_split_reply_thunk(
         goto finish;
     }
     CC_LOG_DEBUG("invoking callback in cc_Calculator_split_reply_thunk()\n");
-    CC_LOG_DEBUG("with whole=%d, fraction=%d\n", whole, fraction);
+    CC_LOG_DEBUG("with whole=%" PRId32 ", fraction=%" PRId32 "\n", whole, fraction);
     ii->split_reply_callback(ii, whole, fraction);
     result = 1;
 
