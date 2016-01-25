@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -88,8 +88,12 @@ public class MockFModel {
         return result;
     }
 
+    public static FTypeRef makeTypeRef() {
+        return FrancaFactory.eINSTANCE.createFTypeRef();
+    }
+
     public static FTypeRef makeTypeRef(FBasicTypeId typeId) {
-        FTypeRef result = FrancaFactory.eINSTANCE.createFTypeRef();
+        FTypeRef result = makeTypeRef();
         result.eSet(result.eClass().getEStructuralFeature("predefined"), typeId);
         return result;
     }

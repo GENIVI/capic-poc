@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -29,8 +29,6 @@ import org.hamcrest.Matcher
 import org.junit.runner.RunWith
 import org.junit.Test
 import org.junit.Assert
-import org.franca.core.franca.FrancaFactory
-import org.franca.core.franca.FTypeRef
 
 @RunWith(XtextRunner)
 @InjectWith(FrancaIDLTestsInjectorProvider)
@@ -43,34 +41,21 @@ class XGeneratorTest {
 
 	@Test
 	def testBasicTypeMappingToCapicSignature() {
-		val FTypeRef type = FrancaFactory.eINSTANCE.createFTypeRef()
-		assertEquals(FBasicTypeId.UNDEFINED, type.getPredefined())
-		try { type.asCapicSig; fail("Expected UnsupportedOperationException"); }
+		assertThat(makeTypeRef().getPredefined(), is(FBasicTypeId.UNDEFINED))
+		try { makeTypeRef().asSdBusSig; fail("Expected UnsupportedOperationException"); }
 		catch (UnsupportedOperationException e) {}
-		type.setPredefined(FBasicTypeId.BOOLEAN)
-		assertThat(type.asCapicSig, is("bool "))
-		type.setPredefined(FBasicTypeId.INT8)
-		assertThat(type.asCapicSig, is("int8_t "))
-		type.setPredefined(FBasicTypeId.INT16)
-		assertThat(type.asCapicSig, is("int16_t "))
-		type.setPredefined(FBasicTypeId.INT32)
-		assertThat(type.asCapicSig, is("int32_t "))
-		type.setPredefined(FBasicTypeId.INT64)
-		assertThat(type.asCapicSig, is("int64_t "))
-		type.setPredefined(FBasicTypeId.UINT8)
-		assertThat(type.asCapicSig, is("uint8_t "))
-		type.setPredefined(FBasicTypeId.UINT16)
-		assertThat(type.asCapicSig, is("uint16_t "))
-		type.setPredefined(FBasicTypeId.UINT32)
-		assertThat(type.asCapicSig, is("uint32_t "))
-		type.setPredefined(FBasicTypeId.UINT64)
-		assertThat(type.asCapicSig, is("uint64_t "))
-		type.setPredefined(FBasicTypeId.FLOAT)
-		assertThat(type.asCapicSig, is("float "))
-		type.setPredefined(FBasicTypeId.DOUBLE)
-		assertThat(type.asCapicSig, is("double "))
-		type.setPredefined(FBasicTypeId.BYTE_BUFFER)
-		try { type.asCapicSig; fail("Expected IllegalArgumentException"); }
+		assertThat(makeTypeRef(FBasicTypeId.BOOLEAN).asCapicSig, is("bool "))
+		assertThat(makeTypeRef(FBasicTypeId.INT8).asCapicSig, is("int8_t "))
+		assertThat(makeTypeRef(FBasicTypeId.INT16).asCapicSig, is("int16_t "))
+		assertThat(makeTypeRef(FBasicTypeId.INT32).asCapicSig, is("int32_t "))
+		assertThat(makeTypeRef(FBasicTypeId.INT64).asCapicSig, is("int64_t "))
+		assertThat(makeTypeRef(FBasicTypeId.UINT8).asCapicSig, is("uint8_t "))
+		assertThat(makeTypeRef(FBasicTypeId.UINT16).asCapicSig, is("uint16_t "))
+		assertThat(makeTypeRef(FBasicTypeId.UINT32).asCapicSig, is("uint32_t "))
+		assertThat(makeTypeRef(FBasicTypeId.UINT64).asCapicSig, is("uint64_t "))
+		assertThat(makeTypeRef(FBasicTypeId.FLOAT).asCapicSig, is("float "))
+		assertThat(makeTypeRef(FBasicTypeId.DOUBLE).asCapicSig, is("double "))
+		try { makeTypeRef(FBasicTypeId.BYTE_BUFFER).asCapicSig; fail("Expected IllegalArgumentException"); }
 		catch (IllegalArgumentException e) {}
 		return
 	}
@@ -211,16 +196,9 @@ class XGeneratorTest {
 
 
 	@Test
-	def testEmtpySymbolsAsParam() {
-		val FArgument[] argList = #[]
-		val args = makeArgList(argList)
-		assertThatSeq(args.byVal(Capic).asParam, is(""))
-		assertThatSeq(args.byRef(Capic).asParam, is(""))
-	}
-
-
-	@Test
 	def testCapicSymbolsAsParam() {
+		assertThatSeq(#[].byVal(Capic).asParam, is(""))
+		assertThatSeq(#[].byRef(Capic).asParam, is(""))
 		val FArgument[] argList = #[
 			makeArgument(FBasicTypeId.BOOLEAN, "p1"),
 			makeArgument(FBasicTypeId.FLOAT, "p2"),
@@ -233,15 +211,8 @@ class XGeneratorTest {
 
 
 	@Test
-	def testEmtpySymbolsAsDecl() {
-		val FArgument[] argList = #[]
-		val args = makeArgList(argList)
-		assertThatSeq(args.byVal(SdBus).asDecl, is(""))
-	}
-
-
-	@Test
 	def testSdBusSymbolsAsDecl() {
+		assertThatSeq(#[].byVal(SdBus).asDecl, is(""))
 		val FArgument[] argList = #[
 			makeArgument(FBasicTypeId.BOOLEAN, "v1"),
 			makeArgument(FBasicTypeId.FLOAT, "v2"),
@@ -286,9 +257,9 @@ class XGeneratorTest {
 		val args = makeArgList(argList)
 		assertThatSeq(args.byVal(Capic).asRVal(SdBus), is(", (int) a1, (double) a2, (uint8_t) a3, a4"))
 		assertThatSeq(args.byRef(Capic).asRef(SdBus), is(", &a1_int, &a2_double, &a3_uint8_t, a4"))
-		assertThatSeq(args.byRef(Capic).asRVal(Printf), is(", (int) *a1, *a2, *a3, *a4"))
+		assertThatSeq(args.byRef(Capic).asRVal(Printf), is(", (int) *a1, (double) *a2, *a3, *a4"))
 		assertThatSeq(args.byVal(SdBus).asRVal(Capic), is(", !!a1_int, (float) a2_double, (int8_t) a3_uint8_t, a4"))
-		assertThatSeq(args.byVal(SdBus).asRVal(Printf), is(", !!a1_int, (float) a2_double, (int8_t) a3_uint8_t, a4"))
+		assertThatSeq(args.byVal(SdBus).asRVal(Printf), is(", !!a1_int, a2_double, (int8_t) a3_uint8_t, a4"))
 		assertThatSeq(args.byVal(SdBus).asRef(SdBus), is(", &a1_int, &a2_double, &a3_uint8_t, &a4"))
 	}
 
@@ -307,7 +278,6 @@ class XGeneratorTest {
 			makeArgument(FBasicTypeId.FLOAT, "s3"),
 			makeArgument(FBasicTypeId.INT8, "s4")]
 		val argsDiff = makeArgList(argDiffList)
-		
 		//FIXME: use the right matcher; isEqual does not work as expected for Iterable<Symbol>
 		//assertThat(args.byVal(SdBus).diffBySig(args.byVal(Capic)), is(argsDiff.byVal(SdBus)))
 		val result = args.byVal(SdBus).diffBySig(args.byVal(Capic))
@@ -386,6 +356,11 @@ class XGeneratorTest {
 		assertThat(arg1.byVal(SdBus).asRVal(Capic), is("!!a2_int"))
 		assertThat(arg1.byVal(SdBus).asRVal(Printf), is("!!a2_int"))
 		assertThat(arg1.byRef(Capic).asRVal(Printf), is("(int) *a2"))
+		val arg2 = makeArgument(FBasicTypeId.FLOAT, "a3")
+		assertThat(arg2.byVal(Capic).asRVal(SdBus), is("(double) a3"))
+		assertThat(arg2.byVal(SdBus).asRVal(Capic), is("(float) a3_double"))
+		assertThat(arg2.byVal(SdBus).asRVal(Printf), is("a3_double"))
+		assertThat(arg2.byRef(Capic).asRVal(Printf), is("(double) *a3"))
 	}
 
 
@@ -414,34 +389,21 @@ class XGeneratorTest {
 
 
 	def testBasicTypeMappingToSdBusSig() {
-		val FTypeRef type = FrancaFactory.eINSTANCE.createFTypeRef()
-		assertEquals(FBasicTypeId.UNDEFINED, type.getPredefined())
-		try { type.asSdBusSig; fail("Expected UnsupportedOperationException"); }
+		assertThat(makeTypeRef().getPredefined(), is(FBasicTypeId.UNDEFINED))
+		try { makeTypeRef().asSdBusSig; fail("Expected UnsupportedOperationException"); }
 		catch (UnsupportedOperationException e) {}
-		type.setPredefined(FBasicTypeId.BOOLEAN)
-		assertThat(type.asSdBusSig, is("b"))
-		type.setPredefined(FBasicTypeId.INT8)
-		assertThat(type.asSdBusSig, is("y"))
-		type.setPredefined(FBasicTypeId.INT16)
-		assertThat(type.asSdBusSig, is("n"))
-		type.setPredefined(FBasicTypeId.INT32)
-		assertThat(type.asSdBusSig, is("i"))
-		type.setPredefined(FBasicTypeId.INT64)
-		assertThat(type.asSdBusSig, is("x"))
-		type.setPredefined(FBasicTypeId.UINT8)
-		assertThat(type.asSdBusSig, is("y"))
-		type.setPredefined(FBasicTypeId.UINT16)
-		assertThat(type.asSdBusSig, is("q"))
-		type.setPredefined(FBasicTypeId.UINT32)
-		assertThat(type.asSdBusSig, is("u"))
-		type.setPredefined(FBasicTypeId.UINT64)
-		assertThat(type.asSdBusSig, is("t"))
-		type.setPredefined(FBasicTypeId.FLOAT)
-		assertThat(type.asSdBusSig, is("d"))
-		type.setPredefined(FBasicTypeId.DOUBLE)
-		assertThat(type.asSdBusSig, is("d"))
-		type.setPredefined(FBasicTypeId.BYTE_BUFFER)
-		try { type.asSdBusSig; fail("Expected IllegalArgumentException"); }
+		assertThat(makeTypeRef(FBasicTypeId.BOOLEAN).asSdBusSig, is("b"))
+		assertThat(makeTypeRef(FBasicTypeId.INT8).asSdBusSig, is("y"))
+		assertThat(makeTypeRef(FBasicTypeId.INT16).asSdBusSig, is("n"))
+		assertThat(makeTypeRef(FBasicTypeId.INT32).asSdBusSig, is("i"))
+		assertThat(makeTypeRef(FBasicTypeId.INT64).asSdBusSig, is("x"))
+		assertThat(makeTypeRef(FBasicTypeId.UINT8).asSdBusSig, is("y"))
+		assertThat(makeTypeRef(FBasicTypeId.UINT16).asSdBusSig, is("q"))
+		assertThat(makeTypeRef(FBasicTypeId.UINT32).asSdBusSig, is("u"))
+		assertThat(makeTypeRef(FBasicTypeId.UINT64).asSdBusSig, is("t"))
+		assertThat(makeTypeRef(FBasicTypeId.FLOAT).asSdBusSig, is("d"))
+		assertThat(makeTypeRef(FBasicTypeId.DOUBLE).asSdBusSig, is("d"))
+		try { makeTypeRef(FBasicTypeId.BYTE_BUFFER).asSdBusSig; fail("Expected IllegalArgumentException"); }
 		catch (IllegalArgumentException e) {}
 		return
 	}
@@ -461,14 +423,37 @@ class XGeneratorTest {
 	}
 
 
+	def testBasicTypeMappingToPrintfSig() {
+		assertThat(makeTypeRef().getPredefined(), is(FBasicTypeId.UNDEFINED))
+		try { makeTypeRef().asSdBusSig; fail("Expected UnsupportedOperationException"); }
+		catch (UnsupportedOperationException e) {}
+		assertThat(makeTypeRef(FBasicTypeId.BOOLEAN).asPrintfSig, is("d"))
+		assertThat(makeTypeRef(FBasicTypeId.INT8).asPrintfSig, is("PRId8"))
+		assertThat(makeTypeRef(FBasicTypeId.INT16).asPrintfSig, is("PRId16"))
+		assertThat(makeTypeRef(FBasicTypeId.INT32).asPrintfSig, is("PRId32"))
+		assertThat(makeTypeRef(FBasicTypeId.INT64).asPrintfSig, is("PRId64"))
+		assertThat(makeTypeRef(FBasicTypeId.UINT8).asPrintfSig, is("PRIu8"))
+		assertThat(makeTypeRef(FBasicTypeId.UINT16).asPrintfSig, is("PRIu16"))
+		assertThat(makeTypeRef(FBasicTypeId.UINT32).asPrintfSig, is("PRIu32"))
+		assertThat(makeTypeRef(FBasicTypeId.UINT64).asPrintfSig, is("PRIu64"))
+		assertThat(makeTypeRef(FBasicTypeId.FLOAT).asPrintfSig, is("g"))
+		assertThat(makeTypeRef(FBasicTypeId.DOUBLE).asPrintfSig, is("g"))
+		try { makeTypeRef(FBasicTypeId.BYTE_BUFFER).asSdBusSig; fail("Expected IllegalArgumentException"); }
+		catch (IllegalArgumentException e) {}
+		return
+	}
+
+
 	@Test
 	def testSymbolsAsPrintfFormat() {
+		assertThatSeq(#[].byRef(Capic).asPrintfFormat, is("void"));
 		val FArgument[] argList = #[
 			makeArgument(FBasicTypeId.BOOLEAN, "pp1"),
 			makeArgument(FBasicTypeId.FLOAT, "pp2"),
-			makeArgument(FBasicTypeId.UINT8, "pp3"),
-			makeArgument(FBasicTypeId.INT32, "pp4")]
+			makeArgument(FBasicTypeId.DOUBLE, "pp3"),
+			makeArgument(FBasicTypeId.INT8, "pp4"),
+			makeArgument(FBasicTypeId.UINT32, "pp5")]
 		val args = makeArgList(argList)
-		assertThatSeq(args.byRef(Capic).asPrintfFormat, is("pp1=%d, pp2=%g, pp3=%u, pp4=%d"))
+		assertThatSeq(args.byRef(Capic).asPrintfFormat, is("pp1=%d, pp2=%g, pp3=%g, pp4=%\" PRId8 \", pp5=%\" PRIu32 \""))
 	}
 }

@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -110,6 +110,7 @@ class XGenerator {
 		#include <assert.h>
 		#include <errno.h>
 		#include <stdlib.h>
+		#include <inttypes.h>
 		#include <capic/backend.h>
 		#include <capic/dbus-private.h>
 		#include <capic/log.h>
@@ -737,7 +738,7 @@ class XGenerator {
 				throw new UnsupportedOperationException("Derived and Integer types are not supported")
 			return switch (type.predefined) {
 				case FBasicTypeId::BOOLEAN:     "(int) *" + name
-				case FBasicTypeId::FLOAT,
+				case FBasicTypeId::FLOAT:       "(double) *" + name
 				case FBasicTypeId::INT8,
 				case FBasicTypeId::INT16,
 				case FBasicTypeId::INT32,
@@ -750,12 +751,30 @@ class XGenerator {
 				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
 			}
 		}
-		if (it.domain == SdBus && (domain == Printf || domain == Capic) && !it.isRef) {
+		if (it.domain == SdBus && domain == Capic && !it.isRef) {
 			if (type.predefined == FBasicTypeId.UNDEFINED)
 				throw new UnsupportedOperationException("Derived and Integer types are not supported")
 			return switch (type.predefined) {
 				case FBasicTypeId::BOOLEAN:     "!!" + name + "_int"
 				case FBasicTypeId::FLOAT:       "(float) " + name + "_double"
+				case FBasicTypeId::INT8:        "(int8_t) " + name + "_uint8_t"
+				case FBasicTypeId::INT16,
+				case FBasicTypeId::INT32,
+				case FBasicTypeId::INT64,
+				case FBasicTypeId::UINT8,
+				case FBasicTypeId::UINT16,
+				case FBasicTypeId::UINT32,
+				case FBasicTypeId::UINT64,
+				case FBasicTypeId::DOUBLE:      name
+				default: throw new IllegalArgumentException("Unsupported basic type " + type.predefined.toString)
+			}
+		}
+		if (it.domain == SdBus && domain == Printf && !it.isRef) {
+			if (type.predefined == FBasicTypeId.UNDEFINED)
+				throw new UnsupportedOperationException("Derived and Integer types are not supported")
+			return switch (type.predefined) {
+				case FBasicTypeId::BOOLEAN:     "!!" + name + "_int"
+				case FBasicTypeId::FLOAT:       name + "_double"
 				case FBasicTypeId::INT8:        "(int8_t) " + name + "_uint8_t"
 				case FBasicTypeId::INT16,
 				case FBasicTypeId::INT32,
@@ -848,14 +867,14 @@ class XGenerator {
 		switch (predefined) {
 			case FBasicTypeId::BOOLEAN:     "d"
 			case FBasicTypeId::FLOAT:       "g"
-			case FBasicTypeId::INT8:        "d"
-			case FBasicTypeId::INT16:       "d"
-			case FBasicTypeId::INT32:       "d"
-			case FBasicTypeId::INT64:       "d"
-			case FBasicTypeId::UINT8:       "u"
-			case FBasicTypeId::UINT16:      "u"
-			case FBasicTypeId::UINT32:      "u"
-			case FBasicTypeId::UINT64:      "u"
+			case FBasicTypeId::INT8:        "\" PRId8 \""
+			case FBasicTypeId::INT16:       "\" PRId16 \""
+			case FBasicTypeId::INT32:       "\" PRId32 \""
+			case FBasicTypeId::INT64:       "\" PRId64 \""
+			case FBasicTypeId::UINT8:       "\" PRIu8 \""
+			case FBasicTypeId::UINT16:      "\" PRIu16 \""
+			case FBasicTypeId::UINT32:      "\" PRIu32 \""
+			case FBasicTypeId::UINT64:      "\" PRIu64 \""
 			case FBasicTypeId::DOUBLE:      "g"
 			default: throw new IllegalArgumentException("Unsupported basic type " + predefined.toString)
 		}
