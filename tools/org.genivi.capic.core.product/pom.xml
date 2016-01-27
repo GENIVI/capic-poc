@@ -32,6 +32,14 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <products>
+            <product>
+              <id>org.genivi.capic.core.product</id>
+              <archiveFileName>capic-core-gen</archiveFileName>
+            </product>
+          </products>
+        </configuration>
       </plugin>
     </plugins>
   </build>

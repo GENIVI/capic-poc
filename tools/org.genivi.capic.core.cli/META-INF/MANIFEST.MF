@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: CAPIC Core CLI
+Bundle-Name: Common API C Core Code Generator CLI
 Bundle-SymbolicName: org.genivi.capic.core.cli;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
@@ -11,3 +11,4 @@ Require-Bundle: org.eclipse.equinox.app,
  com.google.inject;bundle-version="3.0.0"
 Import-Package: org.eclipse.core.runtime,
  org.franca.core.dsl
+Bundle-Vendor: Visteon Corp.

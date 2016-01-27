@@ -1,14 +1,16 @@
-/* SPDX license identifier: MPL-2.0
+/* SPDX license identifier: EPL-1.0
  * Copyright (C) 2015, Visteon Corp.
- * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
  *
- * This Source Code Form is subject to the terms of the
- * Mozilla Public License (MPL), version 2.0.
- * If a copy of the MPL was not distributed with this file,
- * you can obtain one at http://mozilla.org/MPL/2.0/.
+ * This program and the accompanying materials are made available
+ * under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html.
  * For further information see http://www.genivi.org/.
+ *
+ * Contributors:
+ *   Pavel Konopelko, pkonopel@visteon.com
  */
 package org.genivi.capic.core.ui.handlers;
 

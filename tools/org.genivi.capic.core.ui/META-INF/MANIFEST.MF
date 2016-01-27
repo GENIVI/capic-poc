@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Common API C Code Generator UI
+Bundle-Name: Common API C Core Code Generator UI
 Bundle-SymbolicName: org.genivi.capic.core.ui;singleton:=true
 Bundle-Version: 0.1.0.qualifier
 Bundle-Activator: org.genivi.capic.core.ui.Activator
@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.ui,
  org.genivi.capic.core;bundle-version="0.1.0",
  org.franca.core.dsl.ui;bundle-version="0.10.0",
  org.eclipse.xtext.ui;bundle-version="2.8.4"
+Bundle-Vendor: Visteon Corp.

@@ -14,3 +14,4 @@ Import-Package: org.antlr.runtime;version="3.2.0",
  org.apache.log4j;version="1.2.15",
  org.eclipse.xtext,
  org.eclipse.xtext.util
+Bundle-Vendor: Visteon Corp.
