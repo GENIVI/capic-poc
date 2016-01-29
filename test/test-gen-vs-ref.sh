@@ -46,9 +46,11 @@ mkdir -p "${TEMPORARY_DIR}"
 
 # Adjust working directory since CAPIC generator will create files there.
 cd "${TEMPORARY_DIR}"
-"${GENERATOR}" "${REFERENCE_DIR}/simple/Calculator.fidl" >/dev/null
-"${GENERATOR}" "${REFERENCE_DIR}/game/Ball.fidl" >/dev/null
-"${GENERATOR}" "${REFERENCE_DIR}/smartie/Smartie.fidl" >/dev/null
+"${GENERATOR}" \
+    "${REFERENCE_DIR}/simple/Calculator.fidl" \
+    "${REFERENCE_DIR}/game/Ball.fidl" \
+    "${REFERENCE_DIR}/smartie/Smartie.fidl" \
+    >/dev/null
 cd - >/dev/null
 
 mkdir -p "${FORMATTED_DIR}/ref"

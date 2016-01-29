@@ -36,8 +36,12 @@ import org.genivi.capic.core.GeneratorException;
 import com.google.inject.Injector;
 
 public class Application implements IApplication {
-    private static String usageText = "Usage:\ncapic-core-gen <fidl-file>";
+    private static final String usageText = "Usage:\ncapic-core-gen <fidl-file>...";
     private Injector injector;
+
+    private IWorkspace workspace;
+    private IWorkspaceRoot root;
+    private IProject project;
 
     @Override
     public Object start(IApplicationContext context) throws Exception {
@@ -51,53 +55,18 @@ public class Application implements IApplication {
         System.out.println("GENIVI Common API C Core Standalone Generator");
         final String[] appArgs = (String[]) context.getArguments().get(
             IApplicationContext.APPLICATION_ARGS);
-        for (final String arg : appArgs)
-            System.out.println(arg);
-        if (appArgs.length != 1) {
-            System.out.println("Illegal number of arguments");
+        if (appArgs.length < 1) {
+            System.out.println("Missing arguments");
             System.out.println(usageText);
             return IApplication.EXIT_OK;
         }
 
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IWorkspaceRoot root = workspace.getRoot();
-        //System.out.println("WorkspaceRoot.Location = " + root.getLocationURI());
+        setupWorkspace();
 
-        IProject project = root.getProject("CAPIC Temporary");
-        if (!project.exists())
-            project.create(null);
-        if (!project.isOpen())
-            project.open(null);
+        for (final String arg : appArgs)
+            processInputFile(arg);
 
-        IPath location = new Path(appArgs[0]);
-        IFile file = project.getFile(location.lastSegment());
-        IStatus status = workspace.validateLinkLocation(file, location);
-        if (!status.isOK()) {
-            System.out.println("Invalid file location: " + status.getMessage());
-            return IApplication.EXIT_OK;
-        }
-
-        try {
-            file.createLink(location, IResource.REPLACE, null);
-        } catch (CoreException e) {
-            System.out.println("Unable to link input file: " + e.getMessage());
-            return IApplication.EXIT_OK;
-        }
-
-        Generator generator = injector.getInstance(Generator.class);
-        try {
-            generator.generate(file, new LocalFileMaker(project));
-        } catch (GeneratorException e) {
-            System.out.println("Unable to generate output file: " + e.getMessage());
-        }
-
-        try {
-            project.close(null);
-            project.delete(IResource.FORCE | IResource.ALWAYS_DELETE_PROJECT_CONTENT, null);
-            workspace.save(true, null);
-        } catch (CoreException e) {
-            // silently ignore failure to clean up and save the workspace
-        }
+        teardownWorkspace();
 
         return IApplication.EXIT_OK;
     }
@@ -106,4 +75,50 @@ public class Application implements IApplication {
     public void stop() {
     }
 
+    protected void processInputFile(String fileName) {
+        System.out.println(fileName);
+
+        IPath location = new Path(fileName);
+        IFile file = project.getFile(location.lastSegment());
+        IStatus status = workspace.validateLinkLocation(file, location);
+        if (!status.isOK()) {
+            System.out.println("Invalid file location: " + status.getMessage());
+            return;
+        }
+
+        try {
+            file.createLink(location, IResource.REPLACE, null);
+        } catch (CoreException e) {
+            System.out.println("Unable to link input file: " + e.getMessage());
+            return;
+        }
+
+        Generator generator = injector.getInstance(Generator.class);
+        try {
+            generator.generate(file, new LocalFileMaker(project));
+        } catch (GeneratorException e) {
+            System.out.println("Unable to generate output file: " + e.getMessage());
+        }
+    }
+
+    protected void setupWorkspace() throws CoreException {
+        workspace = ResourcesPlugin.getWorkspace();
+        root = workspace.getRoot();
+
+        project = root.getProject("CAPIC Temporary");
+        if (!project.exists())
+            project.create(null);
+        if (!project.isOpen())
+            project.open(null);
+    }
+
+    protected void teardownWorkspace() {
+        try {
+            project.close(null);
+            project.delete(IResource.FORCE | IResource.ALWAYS_DELETE_PROJECT_CONTENT, null);
+            workspace.save(true, null);
+        } catch (CoreException e) {
+            // silently ignore failure to clean up and save the workspace
+        }
+    }
 }
