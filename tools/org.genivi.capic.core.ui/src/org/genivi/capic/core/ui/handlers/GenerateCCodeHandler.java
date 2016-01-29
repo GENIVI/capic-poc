@@ -14,17 +14,23 @@
  */
 package org.genivi.capic.core.ui.handlers;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import javax.inject.Inject;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.xtext.ui.editor.XtextEditor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.genivi.capic.core.FileTypeException;
 import org.genivi.capic.core.Generator;
 import org.genivi.capic.core.GeneratorException;
 
@@ -47,23 +53,36 @@ public class GenerateCCodeHandler extends AbstractHandler {
      * from the application context.
      */
     public Object execute(ExecutionEvent event) throws ExecutionException {
+        ArrayList<IFile> inputFiles = new ArrayList<IFile>();
+
         IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
         ISelectionService service = window.getSelectionService();
-        if (!(service.getSelection() instanceof IStructuredSelection)) {
-            return null;
-        }
-        IStructuredSelection selection = (IStructuredSelection) service.getSelection();
-        if (!(selection.getFirstElement() instanceof IFile)) {
-            return null;
+        if (service.getSelection() instanceof IStructuredSelection) {
+            IStructuredSelection selection = (IStructuredSelection) service.getSelection();
+            Iterator<?> iter = selection.iterator();
+            while (iter.hasNext()) {
+                Object object = iter.next();
+                if (object instanceof IFile)
+                    inputFiles.add((IFile) object);
+            }
+        } else {
+            IEditorPart editor = HandlerUtil.getActiveEditor(event);
+            Object object = editor.getEditorInput().getAdapter(IFile.class);
+            if (editor instanceof XtextEditor && object instanceof IFile)
+                inputFiles.add((IFile) object);
         }
 
-        //FIXME: Handle multiple selections
-        IFile file = (IFile) selection.getFirstElement();
-        try {
-            generator.generate(file, new WorkspaceFileMaker(file.getProject()));
-        } catch (GeneratorException e) {
-            MessageDialog.openError(
-                    HandlerUtil.getActiveShell(event), "Common API C Generator Error", e.getMessage());
+        for (IFile file : inputFiles) {
+            try {
+                generator.generate(file, new WorkspaceFileMaker(file.getProject()));
+            } catch (FileTypeException e) {
+                // When a command is executed via a shortcut key, the corresponding
+                // selection can include files with deliberate extensions,
+                // including unsupported ones.  Silently ignore the latter files.
+            } catch (GeneratorException e) {
+                MessageDialog.openError(
+                        HandlerUtil.getActiveShell(event), "Common API C Generator Error", e.getMessage());
+            }
         }
         return null;
     }

@@ -49,7 +49,7 @@ public class Generator {
         if (extension == null)
             extension = "";
         if (!extension.equals(FrancaPersistenceManager.FRANCA_FILE_EXTENSION))
-            throw new GeneratorException("Unsupported input file extension '" + extension + "'");
+            throw new FileTypeException("Unsupported input file extension '" + extension + "'");
         try {
             URI uri = URI.createFileURI(inFile.getLocation().toString());
             FModel model = loader.loadModel(uri, uri);
