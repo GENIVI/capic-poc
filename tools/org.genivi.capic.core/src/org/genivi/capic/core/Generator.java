@@ -21,6 +21,7 @@ import javax.inject.Inject;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.franca.core.dsl.FrancaPersistenceManager;
 import org.franca.core.franca.FInterface;
 import org.franca.core.franca.FModel;
@@ -43,19 +44,35 @@ public class Generator {
         return fileMaker.makeFile("", name, source);
     }
 
-    public String generate(IFile inFile, IFileMaker fileMaker) {
-        URI uri = URI.createFileURI(inFile.getLocation().toString());
-        FModel model = loader.loadModel(uri, uri);
-        FInterface ifs = model.getInterfaces().get(0);
-        XGenerator xgen = new XGenerator();
+    public void generate(IFile inFile, IFileMaker fileMaker) throws GeneratorException {
+        String extension = inFile.getFileExtension();
+        if (extension == null)
+            extension = "";
+        if (!extension.equals(FrancaPersistenceManager.FRANCA_FILE_EXTENSION))
+            throw new GeneratorException("Unsupported input file extension '" + extension + "'");
         try {
+            URI uri = URI.createFileURI(inFile.getLocation().toString());
+            FModel model = loader.loadModel(uri, uri);
+            Iterable<Diagnostic> errors = model.eResource().getErrors();
+            String errorMessage = "";
+            for (Diagnostic error : errors) {
+                errorMessage += "\n" + inFile.getLocation().toString() + ":"
+                        + String.valueOf(error.getLine()) + " Error: " + error.getMessage();
+            }
+            if (errors.iterator().hasNext())
+                throw new GeneratorException("Syntax error(s):" + errorMessage);
+            FInterface ifs = model.getInterfaces().get(0);
+            XGenerator xgen = new XGenerator();
             writeFile(fileMaker, "client-" + ifs.getName() + ".h", xgen.generateClientInterfaceHeader(ifs).toString());
             writeFile(fileMaker, "client-" + ifs.getName() + ".c", xgen.generateClientInterfaceBody(ifs).toString());
             writeFile(fileMaker, "server-" + ifs.getName() + ".h", xgen.generateServerInterfaceHeader(ifs).toString());
             writeFile(fileMaker, "server-" + ifs.getName() + ".c", xgen.generateServerInterfaceBody(ifs).toString());
-            return "Successfully generated code for " + inFile.getLocation().toPortableString();
+        } catch (GeneratorException e) {
+            throw e;
         } catch (UnsupportedEncodingException e) {
-            return "Failed to decode input string";
+            throw new GeneratorException("Unsupported output character encoding", e);
+        } catch (Exception e) {
+            throw new GeneratorException("Unexpected error: " + e.toString(), e);
         }
     }
 }

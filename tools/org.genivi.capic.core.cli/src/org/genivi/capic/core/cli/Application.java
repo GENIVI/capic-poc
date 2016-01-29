@@ -31,6 +31,8 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.franca.core.dsl.FrancaIDLStandaloneSetup;
 import org.genivi.capic.core.Generator;
+import org.genivi.capic.core.GeneratorException;
+
 import com.google.inject.Injector;
 
 public class Application implements IApplication {
@@ -83,7 +85,11 @@ public class Application implements IApplication {
         }
 
         Generator generator = injector.getInstance(Generator.class);
-        System.out.println(generator.generate(file, new LocalFileMaker(project)));
+        try {
+            generator.generate(file, new LocalFileMaker(project));
+        } catch (GeneratorException e) {
+            System.out.println("Unable to generate output file: " + e.getMessage());
+        }
 
         try {
             project.close(null);
