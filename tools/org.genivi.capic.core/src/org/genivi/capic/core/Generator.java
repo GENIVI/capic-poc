@@ -61,12 +61,13 @@ public class Generator {
             }
             if (errors.iterator().hasNext())
                 throw new GeneratorException("Syntax error(s):" + errorMessage);
-            FInterface ifs = model.getInterfaces().get(0);
-            XGenerator xgen = new XGenerator();
-            writeFile(fileMaker, "client-" + ifs.getName() + ".h", xgen.generateClientInterfaceHeader(ifs).toString());
-            writeFile(fileMaker, "client-" + ifs.getName() + ".c", xgen.generateClientInterfaceBody(ifs).toString());
-            writeFile(fileMaker, "server-" + ifs.getName() + ".h", xgen.generateServerInterfaceHeader(ifs).toString());
-            writeFile(fileMaker, "server-" + ifs.getName() + ".c", xgen.generateServerInterfaceBody(ifs).toString());
+            for (FInterface ifs : model.getInterfaces()) {
+                XGenerator xgen = new XGenerator();
+                writeFile(fileMaker, "client-" + ifs.getName() + ".h", xgen.generateClientInterfaceHeader(ifs).toString());
+                writeFile(fileMaker, "client-" + ifs.getName() + ".c", xgen.generateClientInterfaceBody(ifs).toString());
+                writeFile(fileMaker, "server-" + ifs.getName() + ".h", xgen.generateServerInterfaceHeader(ifs).toString());
+                writeFile(fileMaker, "server-" + ifs.getName() + ".c", xgen.generateServerInterfaceBody(ifs).toString());
+            }
         } catch (GeneratorException e) {
             throw e;
         } catch (UnsupportedEncodingException e) {
