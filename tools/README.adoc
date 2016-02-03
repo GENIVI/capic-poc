@@ -1,10 +1,32 @@
-
 Common API C Tools
 ==================
 
+Purpose and Features
+--------------------
+Common API C tools include code generators that take Franca IDL files as input and produce C code that is compatible with the run-time support library.  This functionality is available as either standalone binaries (for Linux and Windows platforms) or Eclipse plug-ins.  The former can be used as a part of the build tool chain and requires only Java Runtime to be installed.  The latter extends Eclipse UI with commands to generate Common API C from Franca IDL (`.fidl`) files.
+
+
+Dependencies and Installation
+-----------------------------
+Java 1.7 and Maven 3.3+ must be installed in order to build the Eclipse plug-ins and standalone code generators for Common API C.  All other dependencies will be downloaded during the build automatically.  From the project root directory, a complete clean build can be performed as follows:
+
+----
+$ cd tools/org.genivi.capic.core.parent ; mvn clean verify
+----
+
+After a successful build, the standalone generators for various platforms can be found under `tools/org.genivi.capic.core.product/target/products/org.genivi.capic.core.product/` and the update site for Eclipse plug-ins can be found under `tools/org.genivi.capic.core.updatesite/target/repository/`.
+
+
+Coding Style
+------------
+All Java code uses the Eclipse formatting profile '`Eclipse Spaces Only`'.
+
+All Xtend code use the default Xtend formatting profile.  (Although the latter uses tabs for indentation there seems to be no way to change this in Eclipse configuration.)
+
+
 Development with Eclipse IDE
 ----------------------------
-Use _Eclipse IDE for Java and DSL Developers_ available from the http://www.eclipse.org[Eclipse Project] or equivalent.  Additionally to this:
+Use _Eclipse IDE for Java and DSL Developers_ release _Mars_ or later available from the http://www.eclipse.org[Eclipse Project] or equivalent.  Additionally to this:
 
 * Install _Tycho Configurator_ to support RCP and Eclipse plugin development.  Go to `Preferences > Maven > Discovery` and click on `Open Catalog`.  Find and select the `Tycho Configurator`.
 

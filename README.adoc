@@ -15,6 +15,12 @@ The following principles and constraints apply:
 * Long-term, minimize the redundancy with the Common API for C++ in the areas of Eclipse tooling and run-time support (e.g., backend libraries).
 
 
+License
+-------
+* MPL-2.0 for all source code, except
+* EPL-1.0 for all Eclipse plug-ins in the `tools/` directory.
+
+
 Governance and Infrastructure
 -----------------------------
 This project is run under the governance of GENIVI System Infrastructure Expert Group.  Contributions are accepted from all interested parties independent of their GENIVI affiliation (see <<contribute>>, Option 1).
@@ -30,7 +36,18 @@ Mailing list:
 
 Wiki:
 
-* coming soon
+* https://at.projects.genivi.org/wiki/display/PROJ/Common+API+C
+
+Update site:
+
+* http://docs.projects.genivi.org/common-api-c
+
+
+Code Generation
+---------------
+Common API C project includes code generators that are implemented in Eclipse/Xtend environment and rely on existing Franca plug-ins <<franca>>.  The generators take Franca IDL files as input and produce C code compatible with the run-time support library.
+
+See `tools/README.adoc` for more details.
 
 
 Dependencies and Installation
