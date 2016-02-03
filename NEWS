@@ -1,3 +1,49 @@
+capic 0.2.0
+-----------
+
+* This release introduces C code generators that produce results
+  matching the reference code for the supported Franca features (which
+  did not change since the previous release).  Code generators are
+  implemented in Eclipse/Xtend environment and rely on the existing
+  Franca plug-ins.  The reference code has been slightly tweaked to
+  enable more consistent code generation.
+
+* The run-time support libraries are now compatible with systemd v221
+  (which introduced the first stable API version for sd-bus and
+  sd-event) or later.
+
+* The code generators can be deployed and used either as interactive
+  Eclipse plug-ins or as standalone binaries for Linux and Windows
+  platforms.
+
+* The build infrastructure for the code generators relies on Maven and
+  Tycho.  Both command line based and interactive Eclipse-based builds
+  are supported.
+
+* The verification that the code generator output matches the
+  reference code as well as the deployment of build results are
+  automated through scripts.
+
+* Pre-built generator plug-ins and binaries can be downloaded from the
+  update site:
+
+  http://docs.projects.genivi.org/common-api-c
+
+* Known limitations:
+
+  - Code generator produces output with hard-coded UTF-8 encoding and
+    4 spaces for indentation;
+
+  - Standalone code generator requires absolute paths to .fidl files
+    to be specified as its arguments; the generated files are stored
+    in src-gen/ under the current working directory;
+
+  - Eclipse UI plug-in is unable to detect that a file opened in
+    editor has been modified and uses the outdated version from the
+    file system instead; the generated files are stored in src-gen/
+    under the workspace project where the .fidl file is located.
+
+
 capic 0.1.0
 -----------
 
