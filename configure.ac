@@ -20,14 +20,23 @@ AC_PROG_INSTALL
 LT_PREREQ([2.2])
 LT_INIT([disable-static])
 
+AC_ARG_ENABLE(
+    [logging],
+    AS_HELP_STRING([--disable-logging], [disable loging output @<:@default=enable@:>@]),
+    [], [enable_logging=yes])
+AS_IF(
+    [test "x$enable_logging" = "xyes"],
+    [AC_DEFINE(ENABLE_LOGGING, [1], [Define to enable loging output])])
+
 PKG_CHECK_MODULES([LIBSYSTEMD], [libsystemd >= 219])
 AC_CHECK_LIB(
     [systemd], [sd_bus_open],
     [dummy=yes], [AC_MSG_ERROR([libsystemd must have sd-bus library enabled])])
 AC_CHECK_LIB(
     [systemd], [sd_bus_get_scope],
-    [AC_DEFINE([HAVE_SD_BUS_GET_SCOPE], [1],
-        [Define to 1 if libsystemd supports sd_bus_get_scope() introduced in v221])],
+    [AC_DEFINE(
+        [HAVE_SD_BUS_GET_SCOPE], [1],
+        [Define if libsystemd supports sd_bus_get_scope() introduced in v221])],
     [dummy=yes])
 AC_CHECK_DECLS(
     [SD_EVENT_INITIAL], [], [],
@@ -37,3 +46,9 @@ AC_CHECK_DECLS(
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([Makefile capic.pc])
 AC_OUTPUT
+
+AC_MSG_RESULT([
+    $PACKAGE_NAME $VERSION
+
+    logging: ${enable_logging}
+])

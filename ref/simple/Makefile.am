@@ -1,5 +1,5 @@
 # SPDX license identifier: MPL-2.0
-# Copyright (C) 2015, Visteon Corp.
+# Copyright (C) 2015-2016, Visteon Corp.
 # Author: Pavel Konopelko, pkonopel@visteon.com
 #
 # This file is part of Common API C
@@ -10,17 +10,16 @@
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 # For further information see http://www.genivi.org/.
 
+AM_CFLAGS = $(LIBSYSTEMD_CFLAGS) $(CAPIC_CFLAGS) $(MY_CFLAGS)
+AM_LDFLAGS = $(LIBSYSTEMD_LIBS) $(CAPIC_LIBS)
+
 bin_PROGRAMS = simpleclient simpleserver
 
-simpleclient_CFLAGS = $(LIBSYSTEMD_CFLAGS) $(CAPIC_CFLAGS) -Wall -Werror
-simpleclient_LDFLAGS = $(LIBSYSTEMD_LIBS) $(CAPIC_LIBS)
 simpleclient_SOURCES = \
 	src/simpleclient.c \
 	src-gen/client-Calculator.c \
 	src-gen/client-Calculator.h
 
-simpleserver_CFLAGS = $(LIBSYSTEMD_CFLAGS) $(CAPIC_CFLAGS) -Wall -Werror
-simpleserver_LDFLAGS = $(LIBSYSTEMD_LIBS) $(CAPIC_LIBS)
 simpleserver_SOURCES = \
 	src/simpleserver.c \
 	src-gen/server-Calculator.c \
