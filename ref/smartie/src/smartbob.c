@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -12,6 +12,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 #include <systemd/sd-event.h>
