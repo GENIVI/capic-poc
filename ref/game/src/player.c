@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -69,11 +69,11 @@ typedef int (*player_state_handler_t)(struct player_data *data, enum player_even
 static int player_do_initial(struct player_data *data, enum player_event event)
 {
     gint64 timeout;
+    (void) event;
 
     CC_LOG_DEBUG("invoked player_do_initial()\n");
     assert(data);
 
-    (void) event;
     data->state = STATE_FREE;
     srand(time(NULL));
     timeout = (gint64) (TIMEOUT_IN_FREE_MAX_US * 1.0 * random() / RAND_MAX);
@@ -219,10 +219,10 @@ static gboolean backend_event_prepare(GSource *source, gint *timeout)
 {
     struct cc_event_context *context;
     int result;
+    (void) timeout;
 
     CC_LOG_DEBUG("invoked backend_event_prepare()\n");
     assert(source);
-    (void) timeout;
     context = ((CCEventSource *) source)->event_context;
     result = cc_event_prepare(context);
 
@@ -247,11 +247,11 @@ static gboolean backend_event_dispatch(
 {
     struct cc_event_context *context;
     int result;
+    (void) callback;
+    (void) userdata;
 
     CC_LOG_DEBUG("invoked backend_event_dispatch()\n");
     assert(source);
-    (void) callback;
-    (void) userdata;
     context = ((CCEventSource *) source)->event_context;
     result = cc_event_dispatch(context);
 
@@ -326,7 +326,7 @@ static void initialize_main_context(struct player_data *data)
 }
 
 
-int main(int argc, char *argv[])
+int main()
 {
     int result = 0;
     struct cc_event_context *event_context = NULL;

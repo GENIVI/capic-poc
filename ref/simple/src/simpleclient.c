@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -29,7 +29,7 @@ static void complete_Calculator_split(
     printf("received whole=%d, fraction=%d\n", whole, fraction);
 }
 
-int main(int argc, char *argv[])
+int main()
 {
     int result = 0;
     struct cc_event_context *context = NULL;

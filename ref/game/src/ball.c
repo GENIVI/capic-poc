@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -197,8 +197,10 @@ static struct cc_server_Ball_impl ball_impl = {
 static int ball_land_handler(sd_event_source *source, uint64_t usec, void *userdata)
 {
     struct ball_data *data;
+    (void) usec;
 
     CC_LOG_DEBUG("invoked ball_land_handler()\n");
+    assert(source);
     data = (struct ball_data *) userdata;
     assert(data);
     (void) ball_state_handlers[data->state](data, EVENT_LAND);
@@ -212,6 +214,7 @@ static int backend_event_prepare(sd_event_source *source, void *userdata)
     struct cc_event_context *context = (struct cc_event_context *) userdata;
 
     CC_LOG_DEBUG("invoked backend_event_prepare()\n");
+    assert(source);
     assert(context);
     result = cc_event_prepare(context);
     if (result < 0)
@@ -225,8 +228,11 @@ static int backend_event_dispatch(
 {
     int result;
     struct cc_event_context *context = (struct cc_event_context *) userdata;
+    (void) fd;
+    (void) revents;
 
     CC_LOG_DEBUG("invoked backend_event_dispatch()\n");
+    assert(source);
     assert(context);
     result = cc_event_check(context);
     if (result < 0) {
@@ -249,6 +255,7 @@ static int signal_handler(
     int result;
 
     CC_LOG_DEBUG("invoked signal_handler() with signal %d\n", signal_info->ssi_signo);
+    assert(source);
     assert(event);
     assert(signal_info->ssi_signo == SIGTERM || signal_info->ssi_signo == SIGINT);
 
@@ -289,7 +296,7 @@ static int setup_signals(sd_event *event)
 }
 
 
-int main(int argc, char *argv[])
+int main()
 {
     int result = 0;
     struct cc_event_context *event_context = NULL;

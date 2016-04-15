@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -64,6 +64,7 @@ static int signal_handler(
     int result;
 
     CC_LOG_DEBUG("invoked signal_handler() with signal %d\n", signal_info->ssi_signo);
+    assert(source);
     assert(event);
     assert(signal_info->ssi_signo == SIGTERM || signal_info->ssi_signo == SIGINT);
 
@@ -104,7 +105,7 @@ static int setup_signals(sd_event *event)
 }
 
 
-int main(int argc, char *argv[])
+int main()
 {
     int result = 0;
     struct cc_event_context *context = NULL;

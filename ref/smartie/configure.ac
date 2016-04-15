@@ -32,6 +32,7 @@ AS_IF(
 
 MY_CFLAGS="$MY_CFLAGS \
 -Wall \
+-Wextra \
 -Werror \
 "
 AC_SUBST([MY_CFLAGS])
