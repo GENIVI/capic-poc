@@ -155,7 +155,7 @@ class XGeneratorTest {
 		val inArgs = #[
 				makeArgument(FBasicTypeId.INT32, "arg1"),
 				makeArgument(FBasicTypeId.BOOLEAN, "arg2")]
-		val methods = #[makeMethod("method", inArgs, null, true)]
+		val methods = #[makeMethodFireAndForget("method", inArgs)]
 		val api = makeInterface("TestApi", methods)
 		val clientHeader = xgen.generateClientInterfaceHeader(api).toString()
 		assertThat(clientHeader, not(containsString("cc_TestApi_method_reply_t")))
@@ -166,6 +166,22 @@ class XGeneratorTest {
 		assertThat(clientBody, containsString(
 				"cc_TestApi_method(struct cc_client_TestApi *instance, int32_t arg1, bool arg2"))
 		assertThat(clientBody, not(containsString("cc_TestApi_method_async")))
+	}
+
+
+	@Test
+	def testClientMethodBodies() {
+		val xgen = new XGenerator()
+		val inArgs = #[
+				makeArgument(FBasicTypeId.INT32, "arg1"),
+				makeArgument(FBasicTypeId.BOOLEAN, "arg2")]
+		val outArgs = #[
+				makeArgument(FBasicTypeId.UINT8, "arg10"),
+				makeArgument(FBasicTypeId.DOUBLE, "arg20")]
+		val methods = #[makeMethod("method", inArgs, outArgs, false)]
+		val api = makeInterface("TestApi", methods)
+		val serverBody = xgen.generateClientInterfaceBody(api).toString()
+		assertThat(serverBody, containsString("(void) ret_error;"))
 	}
 
 

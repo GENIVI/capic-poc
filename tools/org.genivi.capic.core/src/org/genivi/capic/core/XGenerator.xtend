@@ -230,6 +230,7 @@ class XGenerator {
 			sd_bus *bus;
 			«api.clientTypeSignature» *ii = («api.clientTypeSignature» *) userdata;
 			«m.outArgs.byVal(SdBus).asDecl»
+			(void) ret_error;
 
 			CC_LOG_DEBUG("invoked «m.clientReplyThunkName»()\n");
 			assert(message);

@@ -80,6 +80,7 @@ static int cc_Ball_grab_reply_thunk(
     sd_bus *bus;
     struct cc_client_Ball *ii = (struct cc_client_Ball *) userdata;
     int success_int;
+    (void) ret_error;
 
     CC_LOG_DEBUG("invoked cc_Ball_grab_reply_thunk()\n");
     assert(message);

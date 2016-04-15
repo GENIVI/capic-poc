@@ -80,6 +80,7 @@ static int cc_Smartie_ring_reply_thunk(
     sd_bus *bus;
     struct cc_client_Smartie *ii = (struct cc_client_Smartie *) userdata;
     int32_t status;
+    (void) ret_error;
 
     CC_LOG_DEBUG("invoked cc_Smartie_ring_reply_thunk()\n");
     assert(message);
@@ -205,6 +206,7 @@ static int cc_Smartie_hangup_reply_thunk(
     sd_bus *bus;
     struct cc_client_Smartie *ii = (struct cc_client_Smartie *) userdata;
     int32_t status;
+    (void) ret_error;
 
     CC_LOG_DEBUG("invoked cc_Smartie_hangup_reply_thunk()\n");
     assert(message);

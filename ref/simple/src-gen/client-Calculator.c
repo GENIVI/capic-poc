@@ -81,6 +81,7 @@ static int cc_Calculator_split_reply_thunk(
     struct cc_client_Calculator *ii = (struct cc_client_Calculator *) userdata;
     int32_t whole;
     int32_t fraction;
+    (void) ret_error;
 
     CC_LOG_DEBUG("invoked cc_Calculator_split_reply_thunk()\n");
     assert(message);
