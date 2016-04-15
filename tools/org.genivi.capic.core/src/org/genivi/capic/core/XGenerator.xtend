@@ -470,7 +470,7 @@ class XGenerator {
 		static const sd_bus_vtable vtable_«api.name»[] = {
 			SD_BUS_VTABLE_START(0),
 			«FOR m : api.methods»
-			SD_BUS_METHOD("«m.name»", «m.inArgs.byVal(SdBus).asSdBusSig», «m.outArgs.byVal(SdBus).asSdBusSig», &«m.serverThunkName», «IF m.fireAndForget»SD_BUS_VTABLE_METHOD_NO_REPLY«ELSE»0«ENDIF»),
+			SD_BUS_METHOD("«m.name»", «m.inArgs.byVal(SdBus).asSdBusSig», «m.outArgs.byVal(SdBus).asSdBusSig», &«m.serverThunkName», «IF m.fireAndForget»SD_BUS_VTABLE_METHOD_NO_REPLY | «ENDIF»SD_BUS_VTABLE_UNPRIVILEGED),
 			«ENDFOR»
 			SD_BUS_VTABLE_END
 		};

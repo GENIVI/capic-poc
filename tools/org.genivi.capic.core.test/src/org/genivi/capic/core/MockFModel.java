@@ -58,6 +58,10 @@ public class MockFModel {
         return makeMethod(name, inArgs, outArgs, false);
     }
 
+    public static FMethod makeMethodFireAndForget(String name, Iterable<FArgument> inArgs) {
+        return makeMethod(name, inArgs, null, true);
+    }
+
     public static FMethod makeMethod(String name, Iterable<FArgument> inArgs, Iterable<FArgument> outArgs, boolean isFireAndForget) {
         FMethod result = FrancaFactory.eINSTANCE.createFMethod();
         if (name != null)

@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -77,7 +77,7 @@ static int cc_Calculator_split_thunk(
 
 static const sd_bus_vtable vtable_Calculator[] = {
     SD_BUS_VTABLE_START(0),
-    SD_BUS_METHOD("split", "d", "ii", &cc_Calculator_split_thunk, 0),
+    SD_BUS_METHOD("split", "d", "ii", &cc_Calculator_split_thunk, SD_BUS_VTABLE_UNPRIVILEGED),
     SD_BUS_VTABLE_END
 };
 

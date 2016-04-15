@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -119,8 +119,8 @@ static int cc_Smartie_hangup_thunk(
 
 static const sd_bus_vtable vtable_Smartie[] = {
     SD_BUS_VTABLE_START(0),
-    SD_BUS_METHOD("ring", "", "i", &cc_Smartie_ring_thunk, 0),
-    SD_BUS_METHOD("hangup", "", "i", &cc_Smartie_hangup_thunk, 0),
+    SD_BUS_METHOD("ring", "", "i", &cc_Smartie_ring_thunk, SD_BUS_VTABLE_UNPRIVILEGED),
+    SD_BUS_METHOD("hangup", "", "i", &cc_Smartie_hangup_thunk, SD_BUS_VTABLE_UNPRIVILEGED),
     SD_BUS_VTABLE_END
 };
 

@@ -181,9 +181,29 @@ class XGeneratorTest {
 				makeArgument(FBasicTypeId.FLOAT, "arg33")]
 		val methods = #[makeMethod("func", inArgs, outArgs)]
 		val api = makeInterface("MyService", methods)
-		val clientHeader = xgen.generateServerInterfaceHeader(api).toString()
-		assertThat(clientHeader, containsString(
+		val serverHeader = xgen.generateServerInterfaceHeader(api).toString()
+		assertThat(serverHeader, containsString(
 				"(*cc_MyService_func_t)(struct cc_server_MyService *instance, uint16_t arg01, int64_t arg02, int8_t *arg11, bool *arg22, float *arg33"))
+	}
+
+
+	@Test
+	def testServerMethodBodies() {
+		val xgen = new XGenerator()
+		val inArgs = #[
+				makeArgument(FBasicTypeId.UINT16, "arg01"),
+				makeArgument(FBasicTypeId.INT64, "arg02")]
+		val outArgs = #[
+				makeArgument(FBasicTypeId.INT8, "arg11"),
+				makeArgument(FBasicTypeId.BOOLEAN, "arg22"),
+				makeArgument(FBasicTypeId.FLOAT, "arg33")]
+		val methods = #[makeMethod("func", inArgs, outArgs), makeMethodFireAndForget("fire", null)]
+		val api = makeInterface("MyService", methods)
+		val serverBody = xgen.generateServerInterfaceBody(api).toString()
+		assertThat(serverBody, containsString(
+				"SD_BUS_METHOD(\"func\", \"qx\", \"ybd\", &cc_MyService_func_thunk, SD_BUS_VTABLE_UNPRIVILEGED),"))
+		assertThat(serverBody, containsString(
+				"SD_BUS_METHOD(\"fire\", \"\", \"\", &cc_MyService_fire_thunk, SD_BUS_VTABLE_METHOD_NO_REPLY | SD_BUS_VTABLE_UNPRIVILEGED),"))
 	}
 
 

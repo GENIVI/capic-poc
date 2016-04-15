@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -113,8 +113,8 @@ static int cc_Ball_drop_thunk(
 
 static const sd_bus_vtable vtable_Ball[] = {
     SD_BUS_VTABLE_START(0),
-    SD_BUS_METHOD("grab", "", "b", &cc_Ball_grab_thunk, 0),
-    SD_BUS_METHOD("drop", "", "", &cc_Ball_drop_thunk, SD_BUS_VTABLE_METHOD_NO_REPLY),
+    SD_BUS_METHOD("grab", "", "b", &cc_Ball_grab_thunk, SD_BUS_VTABLE_UNPRIVILEGED),
+    SD_BUS_METHOD("drop", "", "", &cc_Ball_drop_thunk, SD_BUS_VTABLE_METHOD_NO_REPLY | SD_BUS_VTABLE_UNPRIVILEGED),
     SD_BUS_VTABLE_END
 };
 
