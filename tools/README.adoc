@@ -28,8 +28,12 @@ Development with Eclipse IDE
 ----------------------------
 Use _Eclipse IDE for Java and DSL Developers_ release _Mars_ or later available from the http://www.eclipse.org[Eclipse Project] or equivalent.  Additionally to this:
 
-* Install _Tycho Configurator_ to support RCP and Eclipse plugin development.  Go to `Preferences > Maven > Discovery` and click on `Open Catalog`.  Find and select the `Tycho Configurator`.
+* Install _Tycho Configurator_ to support RCP and Eclipse plugin development.  Go to `Window > Preferences`, select `Maven > Discovery` and click on `Open Catalog`.  Find and select the `Tycho Configurator`.
 
 * Install _Eclipse e4 Tools Developer Resources_ to support e4 application development (such as `rcp` file generation).  Install via `Help > Install New Software...` directly from the preconfigured Mars update site.  (For Eclipse releases prior to Mars use http://download.eclipse.org/e4/updates/[].)
+
+* Install _Franca Runtime_ and _Franca UI_ to use Franca support libraries.  Go to `Help > Install New Software...`, click on `Add...`, add http://franca.github.io/franca/update_site/releases/[Franca update site] and install the plugins.
+
+After completing these steps, it should be possible to import all tooling sub-projects, run the unit tests in `org.genivi.capic.core.test` and build and run the UI plugin in `org.genivi.capic.core.ui`.
 
 Since Maven is considered the primary tool for building Common API C Tools, the content of `.settings/` directories is generally not tracked under version control.  Some subprojects make exception to this rule for certain types of settings.
