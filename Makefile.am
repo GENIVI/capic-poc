@@ -1,5 +1,5 @@
 # SPDX license identifier: MPL-2.0
-# Copyright (C) 2015, Visteon Corp.
+# Copyright (C) 2015-2016, Visteon Corp.
 # Author: Pavel Konopelko, pkonopel@visteon.com
 #
 # This file is part of Common API C
@@ -10,13 +10,20 @@
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 # For further information see http://www.genivi.org/.
 
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/src \
+	-I$(top_builddir) \
+	$(LIBSYSTEMD_CFLAGS)
+
+AM_CFLAGS = \
+	$(MY_CFLAGS) \
+	-fvisibility=hidden
+
 lib_LTLIBRARIES = libcapic.la
 
-libcapic_la_CFLAGS = \
-	-I$(top_srcdir)/src -I$(top_builddir) $(LIBSYSTEMD_CFLAGS) \
-	-Wall -Werror -fvisibility=hidden
-
-libcapic_la_LDFLAGS = -no-undefined -version-info 0:0:0
+libcapic_la_LDFLAGS = \
+	-no-undefined \
+	-version-info 0:0:0
 
 pkginclude_HEADERS = \
 	src/capic/backend.h \

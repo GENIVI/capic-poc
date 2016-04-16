@@ -20,6 +20,8 @@ AC_PROG_INSTALL
 LT_PREREQ([2.2])
 LT_INIT([disable-static])
 
+MY_CFLAGS=""
+
 AC_ARG_ENABLE(
     [logging],
     AS_HELP_STRING([--disable-logging], [disable loging output @<:@default=enable@:>@]),
@@ -43,12 +45,24 @@ AC_CHECK_DECLS(
     [[#include <systemd/sd-bus.h>
       #include <systemd/sd-event.h>]])
 
+MY_CFLAGS="$MY_CFLAGS \
+-Wall \
+-Wextra \
+-Werror \
+"
+AC_SUBST([MY_CFLAGS])
+
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([Makefile capic.pc])
 AC_OUTPUT
 
 AC_MSG_RESULT([
     $PACKAGE_NAME $VERSION
+
+    compiler:  ${CC}
+    CPPFLAGS:  ${CPPFLAGS}
+    CFLAGS:    ${MY_CFLAGS} ${CFLAGS}
+    LDFLAGS:   ${LDFLAGS}
 
     logging: ${enable_logging}
 ])
