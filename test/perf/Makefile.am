@@ -39,3 +39,16 @@ CLEANFILES = src-gen/*.c src-gen/*.h
 # capic-core-gen requires absolute filename as its argument
 src-gen/client-%.c src-gen/client-%.h src-gen/server-%.c src-gen/server-%.h: %.fidl
 	arg=$$(basename $<) ; capic-core-gen $(abs_srcdir)/$${arg}
+
+
+bin_PROGRAMS += sdbus-client sdbus-server
+
+sdbus_client_CFLAGS = $(AM_CFLAGS) $(LIBSYSTEMD_CFLAGS)
+sdbus_client_LDFLAGS = $(LIBSYSTEMD_LIBS)
+sdbus_client_SOURCES = \
+	src/sdbus-client.c
+
+sdbus_server_CFLAGS = $(AM_CFLAGS) $(LIBSYSTEMD_CFLAGS)
+sdbus_server_LDFLAGS = $(LIBSYSTEMD_LIBS)
+sdbus_server_SOURCES = \
+	src/sdbus-server.c
