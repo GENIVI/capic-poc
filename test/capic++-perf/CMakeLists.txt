@@ -87,7 +87,17 @@ add_executable(capic++-server
 )
 target_link_libraries(capic++-server ${CAPICXX_PERF_LIBS})
 
+add_executable(dbus-client
+  src/dbus-client.c
+)
+target_link_libraries(dbus-client ${CAPICXX_PERF_LIBS})
+
+add_executable(dbus-server
+  src/dbus-server.c
+)
+target_link_libraries(dbus-server ${CAPICXX_PERF_LIBS})
+
 install(
-    TARGETS capic++-client capic++-server
+    TARGETS capic++-client capic++-server dbus-client dbus-server
     RUNTIME DESTINATION bin
 )
