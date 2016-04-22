@@ -17,6 +17,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_PROG_CC
 AM_PROG_AR
 AC_PROG_INSTALL
+AC_PROG_AWK
 LT_PREREQ([2.2])
 LT_INIT([disable-static])
 
@@ -50,6 +51,10 @@ MY_CFLAGS="$MY_CFLAGS \
 -Wextra \
 -Werror \
 "
+AS_IF(
+    [test `${CC} -v 2>&1 | tail -n 1 | ${AWK} '{print $1}'` = gcc \
+          -a `${CC} -dumpversion | ${AWK} '{print $1<5.0?"1":"0"}'` = 1],
+    [MY_CFLAGS="$MY_CFLAGS -Wno-missing-field-initializers"])
 AC_SUBST([MY_CFLAGS])
 
 AC_CONFIG_HEADERS(config.h)
@@ -64,5 +69,5 @@ AC_MSG_RESULT([
     CFLAGS:    ${MY_CFLAGS} ${CFLAGS}
     LDFLAGS:   ${LDFLAGS}
 
-    logging: ${enable_logging}
+    logging:   ${enable_logging}
 ])

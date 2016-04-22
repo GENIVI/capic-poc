@@ -16,6 +16,7 @@ AC_COPYRIGHT([Copyright (c) 2015-2016 Visteon Corporation])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_PROG_CC
 AC_PROG_INSTALL
+AC_PROG_AWK
 
 PKG_CHECK_MODULES([LIBSYSTEMD], [libsystemd >= 219])
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
@@ -60,6 +61,10 @@ MY_CFLAGS="$MY_CFLAGS \
 -Wextra \
 -Werror \
 "
+AS_IF(
+    [test `${CC} -v 2>&1 | tail -n 1 | ${AWK} '{print $1}'` = gcc \
+          -a `${CC} -dumpversion | ${AWK} '{print $1<5.0?"1":"0"}'` = 1],
+    [MY_CFLAGS="$MY_CFLAGS -Wno-missing-field-initializers"])
 AC_SUBST([MY_CFLAGS])
 
 AC_CONFIG_HEADERS(config.h)
