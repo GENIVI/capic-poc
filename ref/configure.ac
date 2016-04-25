@@ -10,7 +10,7 @@
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 # For further information see http://www.genivi.org/.
 
-AC_INIT([capic-ref], [0.2.0])
+AC_INIT([capic-ref], [0.2.1])
 AC_COPYRIGHT([Copyright (c) 2015-2016 Visteon Corporation])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])

@@ -1,3 +1,35 @@
+capic 0.2.1
+-----------
+
+* This release introduces the benchmarking code to compare the
+  performance overhead of Common API C.  It allows comparing the
+  synchronous message throughput between the applications that use
+  Common API C vs. direct sd-bus calls.  In addition, a similar
+  benchmark is included for Common API C++ vs. libdbus.
+
+* The build scripts were refactored and modified:
+
+  - Adding support to make the logging output optional.  All
+    ./configure scripts now understand the option '--disable-logging'.
+
+  - Adding the compiler option '-Wextra' to the default settings.
+    Where necessary, the code was cleaned up accordingly.  For GCC
+    <5.0 this includes a workaround for a known (and fixed in 5.0)
+    bug.
+
+  - Consolidating all build scripts for the reference code into one.
+    Individual reference examples can be disabled via ./configure
+    script options '--disable-simple', '--disableb-game', and
+    '--disable-smartie'.
+
+* Several defects were fixed including:
+
+  - Specifying the flag SD_BUS_VTABLE_UNPRIVILEGED in the code
+    generated for sd-bus backend to for all method entries in vtables.
+
+  - Including missing headers in the reference code.
+
+
 capic 0.2.0
 -----------
 

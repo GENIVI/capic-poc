@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.genivi.capic</groupId>
     <artifactId>org.genivi.capic.core.parent</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.1-SNAPSHOT</version>
     <relativePath>../org.genivi.capic.core.parent</relativePath>
   </parent>
   <build>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="capic-core-gen" uid="org.genivi.capic.core.product" id="org.genivi.capic.core.cli.product" application="org.genivi.capic.core.cli.appid" version="0.2.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="capic-core-gen" uid="org.genivi.capic.core.product" id="org.genivi.capic.core.cli.product" application="org.genivi.capic.core.cli.appid" version="0.2.1.qualifier" useFeatures="true" includeLaunchers="true">
 
 
    <configIni use="default">
@@ -31,7 +31,7 @@
    </plugins>
 
    <features>
-      <feature id="org.genivi.capic.core.cli.feature" version="0.2.0.qualifier"/>
+      <feature id="org.genivi.capic.core.cli.feature" version="0.2.1.qualifier"/>
    </features>
 
    <configurations>
