@@ -10,7 +10,6 @@
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 # For further information see http://www.genivi.org/.
 
-
 ##############################################################################
 # Use CAPIC++
 #
@@ -29,13 +28,13 @@
 # * CAPICXX_${name}_${generator}_SERVER_FILES - list of server-side files
 # * CAPICXX_${name}_${generator}_ALL_FILES - list of all files
 #
-# This modules makes the following simplifying assumptions:
+# This module makes the following simplifying assumptions:
 #
 # * all fidl/fdepl files for the build are located in one directory;
-#   ${CMAKE_SOURCE_DIR}/fidl is used as the default value
+#   ${CMAKE_CURRENT_SOURCE_DIR}/fidl is used as the default value
 #
-# * all generated files for the fuild are located in one directory;
-#   ${CMAKE_BINARY_DIR}/src-gen is used as the default value
+# * all generated files for the build are located in one directory;
+#   ${CMAKE_CURRENT_BINARY_DIR}/src-gen is used as the default value
 #
 # * fidl files are named after and include the definition of exactly one
 #   interface/type collection
@@ -64,10 +63,10 @@
 
 
 if (NOT CAPICXX_FIDL_DIR)
-    set(CAPICXX_FIDL_DIR ${CMAKE_SOURCE_DIR}/fidl)
+    set(CAPICXX_FIDL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/fidl)
 endif()
 if (NOT CAPICXX_SRCGEN_DIR)
-    set(CAPICXX_SRCGEN_DIR ${CMAKE_BINARY_DIR}/src-gen)
+    set(CAPICXX_SRCGEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/src-gen)
 endif()
 message(STATUS "CAPICXX_FIDL_DIR     = \"${CAPICXX_FIDL_DIR}\"")
 message(STATUS "CAPICXX_SRCGEN_DIR   = \"${CAPICXX_SRCGEN_DIR}\"")
@@ -217,8 +216,7 @@ endmacro()
 # CAPICXX_get_files(result name generator role [SKELETON])
 # For the interface with given name, set result to the list of files that are
 # produced by the specified generator (CORE or DBUS) for a particular role
-# (CLIENT or SERVER).  Optionally, include include skeleton files for CORE
-# CLIENTS.
+# (CLIENT or SERVER).  Optionally, include skeleton files for CORE CLIENTS.
 #
 function(CAPICXX_get_files result name generator role)
     if (NOT (generator STREQUAL CORE OR generator STREQUAL DBUS))
