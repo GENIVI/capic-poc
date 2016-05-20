@@ -33,19 +33,19 @@ link_directories(
 CAPICXX_ADD_INTERFACE(TestPerf CORE SKELETON)
 CAPICXX_ADD_INTERFACE(TestPerf DBUS)
 
-add_executable(capic++-client
-    src/capic++-client.cpp
+add_executable(capicxx-client
+    src/capicxx-client.cpp
     ${CAPICXX_TestPerf_CORE_CLIENT_FILES}
     ${CAPICXX_TestPerf_DBUS_CLIENT_FILES}
 )
-target_link_libraries(capic++-client ${CAPICXX_LIBRARIES})
+target_link_libraries(capicxx-client ${CAPICXX_LIBRARIES})
 
-add_executable(capic++-server
-    src/capic++-server.cpp
+add_executable(capicxx-server
+    src/capicxx-server.cpp
     ${CAPICXX_TestPerf_CORE_SERVER_FILES}
     ${CAPICXX_TestPerf_DBUS_SERVER_FILES}
 )
-target_link_libraries(capic++-server ${CAPICXX_LIBRARIES})
+target_link_libraries(capicxx-server ${CAPICXX_LIBRARIES})
 
 add_executable(dbus-client
   src/dbus-client.c
@@ -58,6 +58,6 @@ add_executable(dbus-server
 target_link_libraries(dbus-server ${CAPICXX_LIBRARIES})
 
 install(
-    TARGETS capic++-client capic++-server dbus-client dbus-server
+    TARGETS capicxx-client capicxx-server dbus-client dbus-server
     RUNTIME DESTINATION bin
 )

@@ -45,7 +45,7 @@
 #   - generated variable names and make rules differ only by ${name}
 #
 # * code generator executables can be invoked using the names
-#   "capic++-{core|dbus}-gen" and their locations are included in PATH
+#   "capicxx-{core|dbus}-gen" and their locations are included in PATH
 #
 # In order to create the list of generated files, the first use of the
 # CAPICXX_ADD_INTERFACE invokes the corresponding generator to populate
@@ -72,10 +72,10 @@ message(STATUS "CAPICXX_FIDL_DIR     = \"${CAPICXX_FIDL_DIR}\"")
 message(STATUS "CAPICXX_SRCGEN_DIR   = \"${CAPICXX_SRCGEN_DIR}\"")
 
 if (NOT CAPICXX_CORE_GEN_CMD)
-    set(CAPICXX_CORE_GEN_CMD capic++-core-gen)
+    set(CAPICXX_CORE_GEN_CMD capicxx-core-gen)
 endif()
 if (NOT CAPICXX_DBUS_GEN_CMD)
-    set(CAPICXX_DBUS_GEN_CMD capic++-dbus-gen)
+    set(CAPICXX_DBUS_GEN_CMD capicxx-dbus-gen)
 endif()
 message(STATUS "CAPICXX_CORE_GEN_CMD = \"${CAPICXX_CORE_GEN_CMD}\"")
 message(STATUS "CAPICXX_DBUS_GEN_CMD = \"${CAPICXX_DBUS_GEN_CMD}\"")
