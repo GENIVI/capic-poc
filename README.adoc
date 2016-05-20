@@ -7,7 +7,7 @@ The purpose of this project is to enable programs written in C to work with inte
 
 The following principles and constraints apply:
 
-* Align as much as possible with the Franca IDL mapping (e.g., for the data types) and implementation features (e.g., the approach to concurrency) implemented by Common API for C++ <<capicpp>>.
+* Align as much as possible with the Franca IDL mapping (e.g., for the data types) and implementation features (e.g., the approach to concurrency) implemented by Common API for C++ <<capicxx>>.
 * Rely on the existing Franca framework for model transformations and code generation under Eclipse.
 * Leave with applications the design choices related to concurrency (i.e., the main event loop vs. threading), to memory management (i.e., dynamic vs. static allocation) and to other major areas.
 * Prioritize D-Bus/kdbus and in-process communication over other mechanisms for Linux environments.
@@ -27,12 +27,15 @@ This project is run under the governance of GENIVI System Infrastructure Expert 
 
 git repository:
 
-* git://git.projects.genivi.org/common-api/c-poc.git
-* http://git.projects.genivi.org/common-api/c-poc.git
+* https://github.com/GENIVI/capic-poc
 
 Mailing list:
 
 * genivi-ipc@lists.genivi.org
+
+Issue tracker:
+
+* https://at.projects.genivi.org/jira/projects/CC
 
 Wiki:
 
@@ -106,5 +109,5 @@ if (long_expression_that_will_have_to_be_broken_across_multiple_lines &&
 References
 ----------
 * [[[franca]]] https://github.com/franca/franca
-* [[[capicpp]]] http://projects.genivi.org/commonapi/
+* [[[capicxx]]] http://projects.genivi.org/commonapi/
 * [[[contribute]]] http://www.genivi.org/contribute
