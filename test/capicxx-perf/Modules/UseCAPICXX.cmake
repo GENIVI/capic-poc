@@ -57,8 +57,7 @@
 #
 # For developer builds, the variables CAPICXX_FIDL_DIR and CAPICXX_SRCGEN_DIR
 # can be defined to use project-specific directories for fidl/fdepl and
-# generated files.  Additionally, the variables CAPICXX_{CORE|DBUS}_GEN_CMD
-# can be defined to support non-standard locations of generator binaries.
+# generated files.
 ##############################################################################
 
 
@@ -68,17 +67,8 @@ endif()
 if (NOT CAPICXX_SRCGEN_DIR)
     set(CAPICXX_SRCGEN_DIR ${CMAKE_CURRENT_BINARY_DIR}/src-gen)
 endif()
-message(STATUS "CAPICXX_FIDL_DIR     = \"${CAPICXX_FIDL_DIR}\"")
-message(STATUS "CAPICXX_SRCGEN_DIR   = \"${CAPICXX_SRCGEN_DIR}\"")
-
-if (NOT CAPICXX_CORE_GEN_CMD)
-    set(CAPICXX_CORE_GEN_CMD capicxx-core-gen)
-endif()
-if (NOT CAPICXX_DBUS_GEN_CMD)
-    set(CAPICXX_DBUS_GEN_CMD capicxx-dbus-gen)
-endif()
-message(STATUS "CAPICXX_CORE_GEN_CMD = \"${CAPICXX_CORE_GEN_CMD}\"")
-message(STATUS "CAPICXX_DBUS_GEN_CMD = \"${CAPICXX_DBUS_GEN_CMD}\"")
+message(STATUS "CAPICXX_FIDL_DIR        = \"${CAPICXX_FIDL_DIR}\"")
+message(STATUS "CAPICXX_SRCGEN_DIR      = \"${CAPICXX_SRCGEN_DIR}\"")
 
 
 # Specify options to use by particular generators.
@@ -122,11 +112,11 @@ function(CAPICXX_get_files_by_pattern result generator)
             )
         endif()
         if (${generator} STREQUAL CORE)
-            set(_generator_command "${CAPICXX_CORE_GEN_CMD}")
+            set(_generator_command "${CAPICXX_CORE_EXECUTABLE}")
             set(_generator_options ${CAPICXX_CORE_GEN_OPTIONS})
             set(_generator_marker ".core")
         elseif (${generator} STREQUAL DBUS)
-            set(_generator_command "${CAPICXX_DBUS_GEN_CMD}")
+            set(_generator_command "${CAPICXX_DBUS_EXECUTABLE}")
             set(_generator_options ${CAPICXX_DBUS_GEN_OPTIONS})
             set(_generator_marker ".dbus")
         endif()
@@ -268,7 +258,7 @@ macro(CAPICXX_ADD_INTERFACE name generator)
     list(REMOVE_DUPLICATES CAPICXX_${name}_${generator}_ALL_FILES)
     add_custom_command(
         OUTPUT ${CAPICXX_${name}_${generator}_ALL_FILES}
-        COMMAND ${CAPICXX_${generator}_GEN_CMD}
+        COMMAND ${CAPICXX_${generator}_EXECUTABLE}
             -d ${CAPICXX_SRCGEN_DIR}
             ${CAPICXX_${generator}_GEN_OPTIONS}
             ${CAPICXX_FIDL_DIR}/${name}.fidl

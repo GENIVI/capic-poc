@@ -12,7 +12,9 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-include(Modules/FindCAPICXX.cmake)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Modules" ${CMAKE_MODULE_PATH})
+find_package(CAPICXX 3.1.5 REQUIRED)
+
 include(Modules/UseCAPICXX.cmake)
 
 if (NOT CAPICXX_FOUND)
