@@ -10,7 +10,44 @@
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 # For further information see http://www.genivi.org/.
 
-AC_INIT([capic], [0.2.1])
+m4_define([capic_major], [0])
+m4_define([capic_minor], [2])
+m4_define([capic_micro], [1])
+m4_define([capic_nano], [0])
+
+m4_define([capic_base_version],
+          [capic_major.capic_minor.capic_micro])
+
+m4_define([capic_version],
+          [m4_if(capic_nano, 0,
+                [capic_base_version],
+                [capic_base_version].[capic_nano])])
+
+# Before making a release, the version info should be modified.
+# Follow these instructions sequentially:
+#   1. If the library source code has changed at all since the last update, then
+#      increment revision (‘c:r:a’ becomes ‘c:r+1:a’).
+#   2. If any interfaces have been added, removed, or changed since the last
+#      update, increment current, and set revision to 0.
+#   3. If any interfaces have been added since the last public release, then
+#      increment age.
+#   4. If any interfaces have been removed or changed since the last public
+#      release, then set age to 0. Also increment capic_major.
+m4_define([capic_lt_current], [0])
+m4_define([capic_lt_revision], [2])
+m4_define([capic_lt_age], [1])
+
+m4_define([capic_lt_version],
+[capic_lt_current:capic_lt_revision:capic_lt_age])
+
+AC_PREREQ([2.62])
+AC_INIT([capic], capic_version)
+AC_CONFIG_AUX_DIR(config)
+AM_MAINTAINER_MODE([enable])
+AC_SUBST(CAPIC_VERSION,capic_version)
+AC_SUBST(CAPIC_LT_VERSION,capic_lt_version)
+AC_SUBST(CAPIC_API_VERSION,capic_major)
+
 AC_COPYRIGHT([Copyright (c) 2015-2016 Visteon Corporation])
 
 AC_CONFIG_MACRO_DIR([m4])
