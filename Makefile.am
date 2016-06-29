@@ -37,3 +37,13 @@ libcapic_la_SOURCES = \
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = capic.pc
+
+MAINTAINERCLEANFILES = \
+        $(GITIGNORE_MAINTAINERCLEANFILES_TOPLEVEL) \
+        $(GITIGNORE_MAINTAINERCLEANFILES_MAKEFILE_IN) \
+        $(GITIGNORE_MAINTAINERCLEANFILES_M4_LIBTOOL) \
+        configure \
+	Makefile.in \
+        $(NULL)
+
+-include $(top_srcdir)/git.mk
