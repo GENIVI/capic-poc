@@ -52,3 +52,5 @@ sdbus_server_CFLAGS = $(AM_CFLAGS) $(LIBSYSTEMD_CFLAGS)
 sdbus_server_LDFLAGS = $(LIBSYSTEMD_LIBS)
 sdbus_server_SOURCES = \
 	src/sdbus-server.c
+
+-include $(top_srcdir)/git.mk

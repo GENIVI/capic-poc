@@ -67,3 +67,5 @@ smartbob_SOURCES = \
 	smartie/src-gen/client-Smartie.c \
 	smartie/src-gen/client-Smartie.h
 endif
+
+-include $(top_srcdir)/git.mk
