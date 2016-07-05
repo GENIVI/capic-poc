@@ -1,5 +1,5 @@
 /* SPDX license identifier: MPL-2.0
- * Copyright (C) 2015, Visteon Corp.
+ * Copyright (C) 2015-2016, Visteon Corp.
  * Author: Pavel Konopelko, pkonopel@visteon.com
  *
  * This file is part of Common API C
@@ -11,6 +11,7 @@
  * For further information see http://www.genivi.org/.
  */
 
+#include "private.h"
 #include <capic/backend.h>
 
 #include <assert.h>
@@ -19,7 +20,6 @@
 #include <errno.h>
 #include <capic/log.h>
 #include <capic/dbus-private.h>
-#include "private.h"
 
 
 /* FIXME: allocate backend objects on explicit client request */
