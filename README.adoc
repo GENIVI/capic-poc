@@ -62,7 +62,7 @@ All sub-projects require `sd-bus` and `sd-event` (provided as a part of `libsyst
 All sub-projects use autotools and can be built and installed from the git repo with the following commands executed from their respective directory:
 
 ----
-$ autoreconf -i ; ./configure ; make ; sudo make install
+$ ./autogen.sh ; ./configure ; make ; sudo make install
 ----
 
 The build and functionality of the reference examples were tested and are known to work with the fido release of Poky `core-image-minimal` (e.g., with `fido:08d32590411568e7bf11612ac695a6e9c6df6286`) and with Fedora 23 Alpha.  In either environment, the functionality was tested with both `kdbus` and `dbus-1` as the transport.  Since all reference examples use the system bus, the corresponding policy for `dbus-1` on the test system must be relaxed to allow arbitrary applications to connect and communicate (e.g., by modifying `/etc/dbus-1/system-local.conf`).  No policy adjustments are needed for `kdbus`.
