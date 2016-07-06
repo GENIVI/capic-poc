@@ -10,12 +10,12 @@
 *.lo
 *.pc
 .deps/
+build-aux/
 m4/
 .dirstamp
 stamp-h1
 Makefile.in
 Makefile
-compile
 aclocal.m4
 config.guess
 config.h
@@ -24,9 +24,6 @@ config.log
 config.status
 config.sub
 configure
-depcomp
-install-sh
-missing
 .libs/
 ar-lib
 libtool

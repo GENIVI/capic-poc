@@ -14,6 +14,8 @@ AC_INIT([capic], [0.2.1])
 AC_COPYRIGHT([Copyright (c) 2015-2016 Visteon Corporation])
 
 AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([build-aux])
+
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_PROG_CC
 AM_PROG_AR
