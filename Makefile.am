@@ -11,6 +11,7 @@
 # For further information see http://www.genivi.org/.
 
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+AM_MAKEFLAGS = --no-print-directory
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src \
