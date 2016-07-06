@@ -10,6 +10,8 @@
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 # For further information see http://www.genivi.org/.
 
+AM_MAKEFLAGS = --no-print-directory
+
 AM_CPPFLAGS = \
 	-I $(top_srcdir)/simple \
 	-I $(top_srcdir)/game \
