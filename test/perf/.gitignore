@@ -1,0 +1,6 @@
+src-gen/
+workspace/
+capic-client
+capic-server
+sdbus-client
+sdbus-server
