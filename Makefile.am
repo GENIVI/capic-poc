@@ -10,6 +10,8 @@
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 # For further information see http://www.genivi.org/.
 
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src \
 	-I$(top_builddir) \
